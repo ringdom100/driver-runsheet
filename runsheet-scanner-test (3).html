@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -187,7 +188,11 @@ function matchAgainstList(readValue, list, threshold) {
   let bestMatch = null;
   let bestScore = 0;
   for (const item of list) {
-    const score = similarityScore(cleaned, item.toLowerCase());
+    const itemLower = item.toLowerCase();
+    let score = similarityScore(cleaned, itemLower);
+    if (itemLower.startsWith(cleaned) || cleaned.startsWith(itemLower)) {
+      score = Math.max(score, 0.85);
+    }
     if (score > bestScore) {
       bestScore = score;
       bestMatch = item;
@@ -291,6 +296,11 @@ async function runOCR(dataUrl) {
     cleaned = cleaned.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/```\s*$/i, '');
     extracted = JSON.parse(cleaned);
 
+    // Hard safeguard: forcibly discard any driverID the AI may have returned,
+    // regardless of prompt compliance. Driver ID is only ever set below via
+    // a confirmed Employee List name match.
+    if (extracted.header.driverID) delete extracted.header.driverID;
+
     const readName = (extracted.header.driverName.value || '').toLowerCase().trim();
     const nameMatch = matchDriverName(readName);
     if (nameMatch) {
@@ -300,9 +310,34 @@ async function runOCR(dataUrl) {
       extracted.header.driverID = { value: '', confidence: 'medium', matched: false };
     }
 
+    // Hard safeguard: Truck No must be exactly 3 digits and start with 3 or 4.
+    // Anything else is discarded entirely (left blank), regardless of AI confidence.
+    const rawTruckNo = (extracted.header.truckNo.value || '').trim();
+    const truckNoValid = /^[34][0-9]{2}$/.test(rawTruckNo);
+    if (!truckNoValid) {
+      extracted.header.truckNo = { value: '', confidence: 'high' };
+    }
+
     const truckNoVal = extracted.header.truckNo.value;
     const matchedRego = TRUCK_LOOKUP[truckNoVal];
     if (matchedRego) extracted.header.rego = { value: matchedRego, confidence: 'high' };
+
+    const DEPOT_OPTIONS = ['Devon', 'Truganina'];
+    const rawDepot = extracted.header.depot.value;
+    const depotMatch = matchAgainstList(rawDepot, DEPOT_OPTIONS, 0.5);
+    if (depotMatch) {
+      extracted.header.depot = { value: depotMatch, confidence: 'high', matched: true };
+    } else {
+      extracted.header.depot = { value: '', confidence: 'high', matched: false, rawText: rawDepot };
+    }
+
+    if (!extracted.header.date.value || !extracted.header.date.value.trim()) {
+      const today = new Date();
+      const dd = String(today.getDate()).padStart(2, '0');
+      const mm = String(today.getMonth() + 1).padStart(2, '0');
+      const yyyy = today.getFullYear();
+      extracted.header.date = { value: `${dd}/${mm}/${yyyy}`, confidence: 'high', defaulted: true };
+    }
 
     const MATCH_THRESHOLD = 0.8;
     extracted.loads.forEach(load => {
@@ -346,7 +381,7 @@ DO NOT READ DRIVER ID, EVER. Different versions of this run sheet exist with sli
 
 DRIVER NAME: Find the field specifically labelled "Driver:" (a colon after the word Driver) and read the handwritten name written next to or below it. This is a different field from Driver ID - it is the driver's actual name, not a number. If the handwriting next to "Driver:" is genuinely illegible or the field is blank, return an empty string for driverName with confidence "low" rather than guessing a name.
 
-CRITICAL - TRUCK NO FIELD: Truck No is in its own clearly labelled box, typically near the top of the sheet, separate from and NOT the same as the Driver ID box. Truck No is normally a 3-digit number (e.g. 326, 304, 367, 379). The Driver ID box is often printed in bold or colored ink and may look more visually prominent - do not let that prominence cause you to misread or substitute it into Truck No. Locate the box specifically labelled "Truck No" and read only the handwritten digits inside that exact box.
+CRITICAL - TRUCK NO FIELD: Truck No is in its own clearly labelled box, typically near the top of the sheet, separate from and NOT the same as the Driver ID box. Truck No must be exactly 3 digits, and the first digit must be either 3 or 4 (Cartage Australia's entire fleet is numbered in the 300s and 400s). The Driver ID box is often printed in bold or colored ink and may look more visually prominent - do not let that prominence cause you to misread or substitute it into Truck No. Locate the box specifically labelled "Truck No" and read only the handwritten digits inside that exact box. If what you read does not fit the 3-digit, starts-with-3-or-4 pattern, mark confidence as "low" rather than forcing a fit.
 
 CRITICAL ACCURACY RULES FOR NUMBERS:
 Long numbers (6+ digits, like odometer/kms readings) and alphanumeric codes (like docket numbers) are the most common source of misreads. For every numeric or alphanumeric field, follow this process before writing your final answer:
@@ -421,7 +456,8 @@ function fieldHTML(label, obj, path) {
   `;
 }
 
-function matchedFieldHTML(label, obj, path) {
+function matchedFieldHTML(label, obj, path, mode) {
+  mode = mode || 'other';
   if (obj.matched) {
     const conf = obj.confidence || 'high';
     const tagText = conf === 'low' ? 'CHECK THIS' : conf === 'medium' ? 'VERIFY' : 'READ OK';
@@ -436,6 +472,17 @@ function matchedFieldHTML(label, obj, path) {
     `;
   }
   const rawText = (obj.rawText || '').replace(/"/g,'&quot;');
+  if (mode === 'plain') {
+    return `
+      <div class="field">
+        <div class="field-top">
+          <label>${label}</label>
+          <span class="conf-tag medium">NOT RECOGNISED - ENTER MANUALLY</span>
+        </div>
+        <input type="text" value="${rawText}" placeholder="Enter ${label.toLowerCase()}" data-path="${path}" oninput="updateField(this)" class="conf-medium">
+      </div>
+    `;
+  }
   return `
     <div class="field">
       <div class="field-top">
@@ -471,8 +518,11 @@ function renderReview() {
   html += fieldHTML('Driver ID (optional - enter manually if needed)', h.driverID || {value:'',confidence:'high'}, 'header.driverID');
   html += fieldHTML('Truck No', h.truckNo, 'header.truckNo');
   html += fieldHTML('Rego', h.rego, 'header.rego');
+  if (h.date.defaulted) {
+    html += `<div class="status-banner warn" style="margin-bottom:8px;">Could not read a date from the sheet - defaulted to today. Please confirm or correct.</div>`;
+  }
   html += fieldHTML('Date', h.date, 'header.date');
-  html += fieldHTML('Depot', h.depot, 'header.depot');
+  html += matchedFieldHTML('Depot', h.depot, 'header.depot', 'plain');
   html += fieldHTML('Start Time', h.startTime, 'header.startTime');
   html += fieldHTML('Finish Time', h.finishTime, 'header.finishTime');
   html += fieldHTML('Kms Start', h.kmsStart, 'header.kmsStart');
