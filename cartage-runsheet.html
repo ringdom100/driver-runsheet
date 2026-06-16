@@ -826,7 +826,9 @@ function addLoad() {
       <div class="field">
         <label>Pull From (Pickup Location) <span class="req">*</span></label>
         <input type="text" id="pullFrom${idx}" placeholder="e.g. Point Wilson"
-               oninput="validateField(this); updateProgress()" autocomplete="off">
+               oninput="validateField(this); updateProgress()"
+               onblur="autoMatchProduct(${idx})"
+               autocomplete="off">
         <div class="field-error" id="err-pullFrom${idx}">Required</div>
       </div>
       <div class="field">
@@ -836,31 +838,111 @@ function addLoad() {
         <div class="field-error" id="err-deliverTo${idx}">Required</div>
       </div>
       <div class="row-2">
-        <div class="field">
+        <div class="field" style="grid-column: 1 / -1;">
           <label>Product <span class="req">*</span></label>
-          <select id="product${idx}" onchange="validateField(this); updateProgress()">
-            <option value="">— Select —</option>
-            <option>Crushed Rock</option>
-            <option>Blue Metal</option>
-            <option>Sand</option>
-            <option>Gravel</option>
-            <option>Road Base</option>
-            <option>Fill / Clay</option>
-            <option>Topsoil</option>
-            <option>Lime</option>
-            <option>Soda Ash</option>
-            <option>Cullet</option>
-            <option>Recycled Material</option>
-            <option>Other</option>
+          <select id="product${idx}" onchange="handleProductChange(${idx}); validateField(this); updateProgress()">
+            <option value="">— Select or type Pull From to auto-match —</option>
+            <option>Melbourne Sand</option>
+            <option>South East Sands Concrete Sand</option>
+            <option>14mm Graded Boral Lysterfield</option>
+            <option>Boral Deer Park 14mm</option>
+            <option>Boral Deer Park 7mm</option>
+            <option>LTE 80-100mm Rubble</option>
+            <option>Veolia Dandenong</option>
+            <option>GPQ A4 filter sand</option>
+            <option>SES Coastal Beige Brick Sand</option>
+            <option>South East Sands Coastal Beige Sand</option>
+            <option>South East Sands Packing Sand</option>
+            <option>Tribuzi Quarry</option>
+            <option>Holcim Lang Lang Glass Sand</option>
+            <option>Visy Flint</option>
+            <option>Visy Green</option>
+            <option>Visy Amber</option>
+            <option>MVQ Point Wilson 14mm</option>
+            <option>Menheers Loam</option>
+            <option>MVQ Point Wilson 20mm</option>
+            <option>Local Mix Anakie 20mm CR</option>
+            <option>MVQ Little River Mansand</option>
+            <option>Devon Rd Premium Loam</option>
+            <option>MVQ Wyndhamvale 7mm - Bin 4</option>
+            <option>MVQ Wyndhamvale 14mm - Bin 5</option>
+            <option>MVQ Wyndhamvale 20mm - Bin 6</option>
+            <option>MVQ Wyndhamvale Dust - Bin 10</option>
+            <option>Boral Wollert Recycled Crushed Concrete - Bin 13</option>
+            <option>Devon Rd Sandy Loam - Bin 22</option>
+            <option>MVQ Little River 7mm You Yang Granite - Bin 42</option>
+            <option>MVQ Little River 7mm</option>
+            <option>Sand Supplies Glen Forbes</option>
+            <option>Boral Lysterfield 20mm - 100t</option>
+            <option>Boral Lysterfield 14mm</option>
+            <option>Boral Montrose 7mm</option>
+            <option>Boral Montrose Man Sand</option>
+            <option>Boral Lysterfield 20mm</option>
+            <option>Boral Coldstream 14mm</option>
+            <option>Boral Coldstream 7mm</option>
+            <option>Boral Wollert</option>
+            <option>Boral Montrose 14/10/7</option>
+            <option>Hanson Lysterfield 14mm</option>
+            <option>Castella 7mm</option>
+            <option>FH Tynong Dust</option>
+            <option>FH Tynong 14mm</option>
+            <option>Hanson Lysterfield 20mm</option>
+            <option>Metro Nyora Sand</option>
+            <option>Castella 14mm</option>
+            <option>Castella Dust</option>
+            <option>Central Rockbank 20mm</option>
+            <option>Central Rockbank 14mm</option>
+            <option>Central Rockbank Mansand</option>
+            <option>Hanson Wollert 20mm</option>
+            <option>Hanson Wollert 14mm</option>
+            <option>Wyndham Vale 20mm</option>
+            <option>Wyndham Vale 14mm</option>
+            <option>Maude 7mm</option>
+            <option>Little River 20mm</option>
+            <option>Little River Dust</option>
+            <option>Point Wilson 20mm</option>
+            <option>Point Wilson 14mm</option>
+            <option>Seymour 14mm</option>
+            <option>Seymour 20mm</option>
+            <option>Bacchus Marsh 9 Mile Sand</option>
+            <option>Maude 14mm</option>
+            <option>Maude Sand</option>
+            <option>Chelvon Maude Sand</option>
+            <option>W/Vale 14mm Blue</option>
+            <option>Melbourne Sands (Sand)</option>
+            <option>W/Vale 20mm Blue</option>
+            <option>Little River 14mm</option>
+            <option>Little River 7mm</option>
+            <option>W/Vale 7mm Blue</option>
+            <option>Melbourne Sand (Sand)</option>
+            <option value="Other">Other (type below)</option>
           </select>
           <div class="field-error" id="err-product${idx}">Required</div>
+          <!-- Auto-match suggestion banner -->
+          <div id="productSuggest${idx}" style="display:none; margin-top:6px; background:#fffbeb; border:1px solid #fde68a; border-radius:6px; padding:10px 12px; font-size:12px; color:#92400e; line-height:1.5;">
+            <strong>Auto-matched:</strong> <span id="productSuggestText${idx}"></span><br>
+            <span style="color:#78350f;">Is this correct?</span>
+            <div style="display:flex; gap:8px; margin-top:8px;">
+              <button onclick="confirmProduct(${idx}, true)" style="flex:1; background:#10b981; color:white; border:none; border-radius:6px; padding:7px; font-size:12px; font-weight:700; cursor:pointer;">✓ Yes, Correct</button>
+              <button onclick="confirmProduct(${idx}, false)" style="flex:1; background:transparent; border:1.5px solid #d97706; color:#92400e; border-radius:6px; padding:7px; font-size:12px; font-weight:700; cursor:pointer;">✗ No, Change</button>
+            </div>
+          </div>
+          <!-- Other product text input -->
+          <div id="otherProductWrap${idx}" style="display:none; margin-top:8px;">
+            <input type="text" id="otherProduct${idx}" placeholder="Type product name here…"
+                   oninput="updateProgress()" autocomplete="off"
+                   style="border-color: var(--orange);">
+          </div>
         </div>
+      </div>
+      <div class="row-2">
         <div class="field">
           <label>Tonnes <span class="req">*</span></label>
           <input type="number" id="tonnes${idx}" placeholder="0.00" min="0.1" step="0.01"
                  oninput="validateField(this); calcTotals(); updateProgress()" inputmode="decimal">
           <div class="field-error" id="err-tonnes${idx}">Required</div>
         </div>
+        <div></div>
       </div>
       <div class="row-2">
         <div class="field">
@@ -1227,6 +1309,92 @@ function resetForm() {
   window.scrollTo(0,0);
 }
 
+
+// u2500u2500 PRODUCT AUTO-MATCH u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500
+const LOCATION_PRODUCT_MAP = [
+  { keywords: ['point wilson'], products: ['MVQ Point Wilson 14mm','MVQ Point Wilson 20mm','Point Wilson 20mm','Point Wilson 14mm'] },
+  { keywords: ['lysterfield'], products: ['Boral Lysterfield 14mm','Boral Lysterfield 20mm','Hanson Lysterfield 14mm','Hanson Lysterfield 20mm'] },
+  { keywords: ['deer park'], products: ['Boral Deer Park 14mm','Boral Deer Park 7mm'] },
+  { keywords: ['wyndham','wyndhamvale','w/vale'], products: ['MVQ Wyndhamvale 14mm - Bin 5','MVQ Wyndhamvale 20mm - Bin 6','MVQ Wyndhamvale 7mm - Bin 4','Wyndham Vale 20mm','Wyndham Vale 14mm'] },
+  { keywords: ['little river'], products: ['MVQ Little River Mansand','MVQ Little River 7mm','Little River 20mm','Little River 14mm','Little River 7mm'] },
+  { keywords: ['montrose'], products: ['Boral Montrose 7mm','Boral Montrose Man Sand','Boral Montrose 14/10/7'] },
+  { keywords: ['coldstream'], products: ['Boral Coldstream 14mm','Boral Coldstream 7mm'] },
+  { keywords: ['wollert'], products: ['Boral Wollert Recycled Crushed Concrete - Bin 13','Boral Wollert','Hanson Wollert 20mm','Hanson Wollert 14mm'] },
+  { keywords: ['maude'], products: ['Maude 7mm','Maude 14mm','Maude Sand','Chelvon Maude Sand'] },
+  { keywords: ['seymour'], products: ['Seymour 14mm','Seymour 20mm'] },
+  { keywords: ['castella'], products: ['Castella 7mm','Castella 14mm','Castella Dust'] },
+  { keywords: ['tynong'], products: ['FH Tynong 14mm','FH Tynong Dust'] },
+  { keywords: ['rockbank','central'], products: ['Central Rockbank 20mm','Central Rockbank 14mm','Central Rockbank Mansand'] },
+  { keywords: ['nyora'], products: ['Metro Nyora Sand'] },
+  { keywords: ['lang lang','holcim'], products: ['Holcim Lang Lang Glass Sand'] },
+  { keywords: ['visy'], products: ['Visy Flint','Visy Green','Visy Amber'] },
+  { keywords: ['veolia','dandenong'], products: ['Veolia Dandenong'] },
+  { keywords: ['devon'], products: ['Devon Rd Premium Loam','Devon Rd Sandy Loam - Bin 22'] },
+  { keywords: ['anakie'], products: ['Local Mix Anakie 20mm CR'] },
+  { keywords: ['menheers'], products: ['Menheers Loam'] },
+  { keywords: ['south east sands','ses'], products: ['South East Sands Concrete Sand','South East Sands Coastal Beige Sand','South East Sands Packing Sand'] },
+  { keywords: ['glen forbes','sand supplies'], products: ['Sand Supplies Glen Forbes'] },
+  { keywords: ['bacchus marsh','9 mile'], products: ['Bacchus Marsh 9 Mile Sand'] },
+  { keywords: ['tribuzi'], products: ['Tribuzi Quarry'] },
+  { keywords: ['lte'], products: ['LTE 80-100mm Rubble'] },
+  { keywords: ['gpq'], products: ['GPQ A4 filter sand'] },
+  { keywords: ['melbourne sand'], products: ['Melbourne Sand','Melbourne Sand (Sand)'] },
+];
+
+let pendingSuggestion = {};
+
+function autoMatchProduct(idx) {
+  const pullFrom = (document.getElementById('pullFrom'+idx)?.value || '').toLowerCase().trim();
+  if (!pullFrom) return;
+  const currentVal = document.getElementById('product'+idx)?.value;
+  if (currentVal && currentVal !== '') return;
+  let bestMatch = null, bestScore = 0;
+  for (const entry of LOCATION_PRODUCT_MAP) {
+    for (const kw of entry.keywords) {
+      if (pullFrom.includes(kw) && kw.length > bestScore) {
+        bestScore = kw.length;
+        bestMatch = entry.products[0];
+      }
+    }
+  }
+  if (bestMatch) {
+    pendingSuggestion[idx] = bestMatch;
+    document.getElementById('productSuggestText'+idx).textContent = bestMatch;
+    document.getElementById('productSuggest'+idx).style.display = 'block';
+  }
+}
+
+function confirmProduct(idx, confirmed) {
+  const suggestionEl = document.getElementById('productSuggest'+idx);
+  if (confirmed) {
+    const product = pendingSuggestion[idx];
+    const select = document.getElementById('product'+idx);
+    if (select) {
+      for (let i = 0; i < select.options.length; i++) {
+        if (select.options[i].text === product || select.options[i].value === product) {
+          select.selectedIndex = i; break;
+        }
+      }
+      select.classList.add('valid'); select.classList.remove('error');
+      document.getElementById('err-product'+idx)?.classList.remove('show');
+    }
+    suggestionEl.style.display = 'none';
+    showToast('Product confirmed', 'success');
+  } else {
+    suggestionEl.style.display = 'none';
+    document.getElementById('product'+idx)?.focus();
+  }
+  updateProgress();
+}
+
+function handleProductChange(idx) {
+  const select = document.getElementById('product'+idx);
+  const otherWrap = document.getElementById('otherProductWrap'+idx);
+  const suggestEl = document.getElementById('productSuggest'+idx);
+  if (select.value === 'Other') { otherWrap.style.display = 'block'; document.getElementById('otherProduct'+idx)?.focus(); }
+  else { otherWrap.style.display = 'none'; }
+  if (suggestEl) suggestEl.style.display = 'none';
+}
 function showLoading(msg) { document.getElementById('loadingMsg').textContent=msg||'Please wait…'; document.getElementById('loadingOverlay').classList.add('show'); }
 function hideLoading() { document.getElementById('loadingOverlay').classList.remove('show'); }
 
