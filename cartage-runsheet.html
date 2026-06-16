@@ -653,16 +653,19 @@
       <div class="row-2">
         <div class="field">
           <label>Truck No. <span class="req">*</span></label>
-          <input type="text" id="truckNo" placeholder="e.g. 278"
-                 oninput="validateField(this); updateProgress()" autocomplete="off">
+          <input type="text" id="truckNo" placeholder="e.g. 305"
+                 oninput="lookupTruck(); validateField(this); updateProgress()" autocomplete="off" inputmode="numeric">
           <div class="field-error" id="err-truckNo">Required</div>
         </div>
         <div class="field">
-          <label>Rego <span class="req">*</span></label>
+          <label>Rego <span class="req">*</span> <span class="auto-tag" id="regoAutoTag" style="display:none;">✓ Auto</span></label>
           <input type="text" id="truckRego" placeholder="e.g. XV67VO"
-                 oninput="this.value=this.value.toUpperCase(); validateField(this); updateProgress()"
+                 oninput="this.value=this.value.toUpperCase(); userEditedRego=true; validateField(this); updateProgress()"
                  autocomplete="off" autocapitalize="characters">
           <div class="field-error" id="err-truckRego">Required</div>
+          <div id="truckNoWarning" style="display:none; margin-top:6px; background:#fef2f2; border:1px solid #fecaca; border-radius:6px; padding:8px 11px; font-size:11px; color:#dc2626; line-height:1.5;">
+            ⚠️ Truck number not recognised. Please enter rego manually.
+          </div>
         </div>
       </div>
       <div class="row-2">
@@ -993,6 +996,44 @@ function lookupDriver() {
   }
 }
 
+// ── TRUCK LOOKUP TABLE ──────────────────────────────────────
+// Truck No -> Rego. Update this list when fleet changes occur.
+const TRUCK_LOOKUP = {"305":"XW61HK","307":"XW63HK","312":"XW70HK","315":"XW72HK","317":"XW71HK","319":"XW76HX","318":"XW77HX","323":"XW96HX","325":"XW92IF","331":"XW90IF","326":"XW13IG","328":"XW14IG","330":"XW51ZM","336":"XW36IG","338":"XW28IS","342":"XW60IS","343":"XW30ZQ","332":"XW36IS","334":"XW29IS","341":"XW64IS","344":"XW65IS","356":"XW94JQ","351":"XW70IS","352":"XW74IS","345":"XW66IS","346":"XW67IS","347":"XW68IS","349":"XW72IS","353":"XW75IS","348":"XW71IS","355":"XW46YD","354":"XW73IS","357":"XW40KL","362":"XW46NB","359":"XW21NE","361":"XW37NE","365":"XW22NE","369":"XW45NB","366":"XW91RG","364":"XW44NB","363":"XW47NB","367":"XW52NB","371":"XW20NE","370":"XW49NB","368":"XW48NB","377":"XW59NB","372":"XW42NE","375":"XW57NB","373":"XW51NB","376":"XW34NE","360":"XW28NE","374":"XW38NE","378":"XW23NE","382":"XW43NE","379":"XW25NE","381":"XW52NE","380":"XW56ZM","383":"XW36NE","385":"XW55NB","384":"XW29NE","386":"XW47NE","388":"XW49NE","387":"XW48NE","391":"XW58NB","390":"XW33NE","389":"XW44NE","392":"XW27RB","402":"XW35RB","393":"XW46NE","394":"XW53NB","395":"XW27NE","396":"XW35NE","397":"XW45NE","398":"XW56NB","399":"XW40NE","401":"XW53NE","408":"XW18SO","407":"XW30NE","406":"XW31NE","405":"XW26NE","404":"XW39NE","403":"XW51NE","409":"XW21UN","410":"XW22UN","411":"XW23UN","412":"XW24UN","417":"XW57UN","413":"XW53UN","416":"XW56UN","418":"XW58UN","414":"XW54UN","415":"XW55UN","400":"XW59UN","419":"XW28VW","420":"XW29VW","421":"XW30VW","422":"XW31VW","423":"XW32VW","424":"XW33VW","425":"XW82VW","426":"XW80VW","427":"XW81VW","428":"XW19XD","429":"XW20XD","430":"XW21XD","431":"XW02ZP","432":"XW00ZP","433":"XW01ZP","436":"XW63ZV","435":"XW61ZV","437":"XW62ZV","434":"XX58AZ","438":"XW02ZW","439":"XW03ZW","441":"XW05ZW","442":"XW06ZW","443":"XW07ZW","444":"XW08ZW","449":"XW13ZW","440":"XW04ZW","450":"XW14ZW","448":"XW12ZW","446":"XW10ZW"};
+
+let userEditedRego = false;
+
+function lookupTruck() {
+  const truckNoInput = document.getElementById('truckNo');
+  const truckNo = truckNoInput.value.trim();
+  const regoInput = document.getElementById('truckRego');
+  const warningEl = document.getElementById('truckNoWarning');
+  const autoTag = document.getElementById('regoAutoTag');
+
+  if (!truckNo) {
+    warningEl.style.display = 'none';
+    autoTag.style.display = 'none';
+    return;
+  }
+
+  const match = TRUCK_LOOKUP[truckNo];
+  if (match) {
+    regoInput.value = match;
+    userEditedRego = false;
+    warningEl.style.display = 'none';
+    autoTag.style.display = 'inline-flex';
+    regoInput.classList.add('valid');
+    regoInput.classList.remove('error');
+    document.getElementById('err-truckRego')?.classList.remove('show');
+  } else {
+    autoTag.style.display = 'none';
+    if (!userEditedRego) {
+      regoInput.value = '';
+      regoInput.classList.remove('valid');
+    }
+    warningEl.style.display = 'block';
+  }
+}
+
 // ── STATE ────────────────────────────────────────────────────
 let loadCount = 0;
 const MAX_LOADS = 6;
@@ -1040,17 +1081,125 @@ function addLoad() {
         <div class="field-error" id="err-ticketNo${idx}">Required</div>
       </div>
       <div class="field">
-        <label>Pull From (Pickup Location) <span class="req">*</span></label>
-        <input type="text" id="pullFrom${idx}" placeholder="e.g. Point Wilson"
-               oninput="validateField(this); updateProgress()"
-               onblur="autoMatchProduct(${idx})"
-               autocomplete="off">
+        <label>Pickup Location <span class="req">*</span></label>
+        <select id="pullFrom${idx}" onchange="handleLocationChange(${idx},'pullFrom'); validateField(this); updateProgress()">
+          <option value="">— Select pickup location —</option>
+          <option>Austrak Point Wilson</option>
+          <option>Boral Concrete Clayton</option>
+          <option>Boral Concrete Cranbourne</option>
+          <option>Boral Concrete Healesville</option>
+          <option>Boral Concrete Waurn Ponds</option>
+          <option>Cemix Somerton</option>
+          <option>Cemix Whittelsea</option>
+          <option>Central Deer Park</option>
+          <option>Cmv Bookings Dandenong</option>
+          <option>Cmv Bookings Laverton</option>
+          <option>Eastern Freeway</option>
+          <option>Epping Premix</option>
+          <option>Flinstones Garden Supplies Donnybrook</option>
+          <option>Flinstones Garden Supplies Grovedale</option>
+          <option>Grovedale Concrete Plant</option>
+          <option>Heidelberg Materials Brooklyn</option>
+          <option>Heidelberg Materials Westall</option>
+          <option>Hercules</option>
+          <option>Hytec Dandenong</option>
+          <option>Hytec Kilsyth</option>
+          <option>Hytec Laverton</option>
+          <option>Hytec Mitcham</option>
+          <option>Hytec Somerton</option>
+          <option>Hytec South Wharf</option>
+          <option>Lantrak Pt Wilson</option>
+          <option>Melbourne Sand</option>
+          <option>Moolap Concrete Plant</option>
+          <option>Mulchxpress</option>
+          <option>Pronto Bacchus Marsh</option>
+          <option>Pronto Coburg</option>
+          <option>Pronto Dandenong</option>
+          <option>Pronto Donnybrook</option>
+          <option>Pronto Laverton</option>
+          <option>Pronto Mt Evelyn</option>
+          <option>Pronto Port Melbourne</option>
+          <option>Pronto Pt Melbourne</option>
+          <option>Pronto Pt Wilson</option>
+          <option>Pronto Ringwood</option>
+          <option>Pronto Springvale</option>
+          <option>Pronto Sunbury</option>
+          <option>Pronto Sunshine</option>
+          <option>Pronto Werribee</option>
+          <option>Riversdale Blvd</option>
+          <option>Scania</option>
+          <option>Truganina Workshop</option>
+          <option>Vic Civil</option>
+          <option>Visy Spotswood</option>
+          <option>Westerns</option>
+          <option>Youleys Garden Supplies</option>
+          <option value="Other">Other (type below)</option>
+        </select>
+        <div id="otherPullFromWrap${idx}" style="display:none; margin-top:8px;">
+          <input type="text" id="otherPullFrom${idx}" placeholder="Type pickup location here…"
+                 oninput="updateProgress()" autocomplete="off" style="border-color: var(--orange);">
+        </div>
         <div class="field-error" id="err-pullFrom${idx}">Required</div>
       </div>
       <div class="field">
         <label>Deliver To <span class="req">*</span></label>
-        <input type="text" id="deliverTo${idx}" placeholder="e.g. P Dandenong"
-               oninput="validateField(this); updateProgress()" autocomplete="off">
+        <select id="deliverTo${idx}" onchange="handleLocationChange(${idx},'deliverTo'); validateField(this); updateProgress()">
+          <option value="">— Select delivery location —</option>
+          <option>Austrak Point Wilson</option>
+          <option>Boral Concrete Clayton</option>
+          <option>Boral Concrete Cranbourne</option>
+          <option>Boral Concrete Healesville</option>
+          <option>Boral Concrete Waurn Ponds</option>
+          <option>Cemix Somerton</option>
+          <option>Cemix Whittelsea</option>
+          <option>Central Deer Park</option>
+          <option>Cmv Bookings Dandenong</option>
+          <option>Cmv Bookings Laverton</option>
+          <option>Eastern Freeway</option>
+          <option>Epping Premix</option>
+          <option>Flinstones Garden Supplies Donnybrook</option>
+          <option>Flinstones Garden Supplies Grovedale</option>
+          <option>Grovedale Concrete Plant</option>
+          <option>Heidelberg Materials Brooklyn</option>
+          <option>Heidelberg Materials Westall</option>
+          <option>Hercules</option>
+          <option>Hytec Dandenong</option>
+          <option>Hytec Kilsyth</option>
+          <option>Hytec Laverton</option>
+          <option>Hytec Mitcham</option>
+          <option>Hytec Somerton</option>
+          <option>Hytec South Wharf</option>
+          <option>Lantrak Pt Wilson</option>
+          <option>Melbourne Sand</option>
+          <option>Moolap Concrete Plant</option>
+          <option>Mulchxpress</option>
+          <option>Pronto Bacchus Marsh</option>
+          <option>Pronto Coburg</option>
+          <option>Pronto Dandenong</option>
+          <option>Pronto Donnybrook</option>
+          <option>Pronto Laverton</option>
+          <option>Pronto Mt Evelyn</option>
+          <option>Pronto Port Melbourne</option>
+          <option>Pronto Pt Melbourne</option>
+          <option>Pronto Pt Wilson</option>
+          <option>Pronto Ringwood</option>
+          <option>Pronto Springvale</option>
+          <option>Pronto Sunbury</option>
+          <option>Pronto Sunshine</option>
+          <option>Pronto Werribee</option>
+          <option>Riversdale Blvd</option>
+          <option>Scania</option>
+          <option>Truganina Workshop</option>
+          <option>Vic Civil</option>
+          <option>Visy Spotswood</option>
+          <option>Westerns</option>
+          <option>Youleys Garden Supplies</option>
+          <option value="Other">Other (type below)</option>
+        </select>
+        <div id="otherDeliverToWrap${idx}" style="display:none; margin-top:8px;">
+          <input type="text" id="otherDeliverTo${idx}" placeholder="Type delivery location here…"
+                 oninput="updateProgress()" autocomplete="off" style="border-color: var(--orange);">
+        </div>
         <div class="field-error" id="err-deliverTo${idx}">Required</div>
       </div>
       <div class="row-2">
@@ -1167,22 +1316,6 @@ function addLoad() {
         <div class="field">
           <label>Net (t) <span class="auto-tag">✓ Auto</span></label>
           <input type="text" id="tonnes${idx}" readonly placeholder="0.00">
-        </div>
-      </div>
-      <div class="row-2">
-        <div class="field">
-          <label>Arrive (Customer)</label>
-          <div class="time-picker-trigger" id="arrive${idx}_trigger" onclick="openTimePicker('arrive${idx}')">
-            <span id="arrive${idx}_display" class="time-picker-placeholder">Tap to set time</span>
-          </div>
-          <input type="hidden" id="arrive${idx}">
-        </div>
-        <div class="field">
-          <label>Depart (Customer)</label>
-          <div class="time-picker-trigger" id="depart${idx}_trigger" onclick="openTimePicker('depart${idx}')">
-            <span id="depart${idx}_display" class="time-picker-placeholder">Tap to set time</span>
-          </div>
-          <input type="hidden" id="depart${idx}">
         </div>
       </div>
       <div class="field">
@@ -1354,12 +1487,7 @@ function openTimePicker(fieldId) {
     break1Start: '1st Break Start', break2Start: '2nd Break Start',
     break3Start: '3rd Break Start', break4Start: '4th Break Start',
   };
-  let title = labelMap[fieldId];
-  if (!title) {
-    if (fieldId.startsWith('arrive')) title = 'Arrive (Customer)';
-    else if (fieldId.startsWith('depart')) title = 'Depart (Customer)';
-    else title = 'Set Time';
-  }
+  const title = labelMap[fieldId] || 'Set Time';
   document.getElementById('timePickerTitle').textContent = title;
 
   document.getElementById('timePickerOverlay').classList.add('show');
@@ -1583,6 +1711,16 @@ function checkBlur(dataUrl, callback) {
 }
 
 // ── FIELD VALIDATION ──────────────────────────────────────
+function resolveLocationValue(idx, type) {
+  const select = document.getElementById(`${type}${idx}`);
+  if (!select) return '';
+  if (select.value === 'Other') {
+    const otherId = type === 'pullFrom' ? `otherPullFrom${idx}` : `otherDeliverTo${idx}`;
+    return document.getElementById(otherId)?.value || '';
+  }
+  return select.value;
+}
+
 function validateField(el) {
   const errEl = document.getElementById(`err-${el.id}`);
   if (!errEl) return;
@@ -1601,8 +1739,6 @@ function updateProgress() {
   if (photoData.dockets.some(d=>d!==null)) filled++;
   // Check load 1
   const t1 = document.getElementById('ticketNo1');
-  const p1 = document.getElementById('pullFrom1');
-  const d1 = document.getElementById('deliverTo1');
   const g1 = document.getElementById('gross1');
   const tr1 = document.getElementById('tare1');
   if (t1&&t1.value.trim()) filled++;
@@ -1643,10 +1779,20 @@ function submitForm() {
     }
   });
   // Validate load 1
-  ['ticketNo1','pullFrom1','deliverTo1','gross1','tare1'].forEach((id,i) => {
+  ['ticketNo1','gross1','tare1'].forEach((id,i) => {
     const el = document.getElementById(id);
-    if (!el||!el.value.trim()) { el&&el.classList.add('error'); document.getElementById(`err-${id}`)?.classList.add('show'); errors.push(['Docket Number (Load 1)','Pull From (Load 1)','Deliver To (Load 1)','Gross (Load 1)','Tare (Load 1)'][i]); }
+    if (!el||!el.value.trim()) { el&&el.classList.add('error'); document.getElementById(`err-${id}`)?.classList.add('show'); errors.push(['Docket Number (Load 1)','Gross (Load 1)','Tare (Load 1)'][i]); }
   });
+  if (!resolveLocationValue(1,'pullFrom').trim()) {
+    document.getElementById('pullFrom1')?.classList.add('error');
+    document.getElementById('err-pullFrom1')?.classList.add('show');
+    errors.push('Pickup Location (Load 1)');
+  }
+  if (!resolveLocationValue(1,'deliverTo').trim()) {
+    document.getElementById('deliverTo1')?.classList.add('error');
+    document.getElementById('err-deliverTo1')?.classList.add('show');
+    errors.push('Deliver To (Load 1)');
+  }
   if (document.getElementById('tonnes1')?.value === 'Check weights') errors.push('Load 1: Gross weight must be greater than Tare weight');
   if (!photoData.runSheet) errors.push('Run Sheet photo');
   if (!photoData.dockets.some(d=>d!==null)) errors.push('At least 1 Weighbridge Docket photo');
@@ -1671,14 +1817,12 @@ function submitForm() {
       loads.push({
         load: i,
         docketNumber: document.getElementById(`ticketNo${i}`)?.value||'',
-        pullFrom: document.getElementById(`pullFrom${i}`)?.value||'',
-        deliverTo: document.getElementById(`deliverTo${i}`)?.value||'',
+        pullFrom: resolveLocationValue(i,'pullFrom'),
+        deliverTo: resolveLocationValue(i,'deliverTo'),
         product: document.getElementById(`product${i}`)?.value||'',
         gross: document.getElementById(`gross${i}`)?.value||'',
         tare: document.getElementById(`tare${i}`)?.value||'',
         netTonnes: document.getElementById(`tonnes${i}`)?.value||'',
-        arrive: document.getElementById(`arrive${i}`)?.value||'',
-        depart: document.getElementById(`depart${i}`)?.value||'',
         comments: document.getElementById(`comments${i}`)?.value||'',
       });
     }
@@ -1753,6 +1897,9 @@ function resetForm() {
   verifiedDriverName = null;
   document.getElementById('driverIdWarning').style.display='none';
   document.getElementById('driverIdOk').style.display='none';
+  userEditedRego = false;
+  document.getElementById('truckNoWarning').style.display='none';
+  document.getElementById('regoAutoTag').style.display='none';
   // Reset all time picker triggers
   ['startTime','finishTime','break1Start','break2Start','break3Start','break4Start'].forEach(id => {
     const display = document.getElementById(`${id}_display`);
@@ -1808,8 +1955,26 @@ const LOCATION_PRODUCT_MAP = [
 
 let pendingSuggestion = {};
 
+function handleLocationChange(idx, type) {
+  const select = document.getElementById(`${type}${idx}`);
+  const otherWrap = document.getElementById(`other${type === 'pullFrom' ? 'PullFrom' : 'DeliverTo'}Wrap${idx}`);
+  if (select.value === 'Other') {
+    otherWrap.style.display = 'block';
+    document.getElementById(`other${type === 'pullFrom' ? 'PullFrom' : 'DeliverTo'}${idx}`)?.focus();
+  } else {
+    otherWrap.style.display = 'none';
+  }
+  if (type === 'pullFrom') {
+    autoMatchProduct(idx);
+  }
+}
+
 function autoMatchProduct(idx) {
-  const pullFrom = (document.getElementById('pullFrom'+idx)?.value || '').toLowerCase().trim();
+  let pullFromRaw = document.getElementById('pullFrom'+idx)?.value || '';
+  if (pullFromRaw === 'Other') {
+    pullFromRaw = document.getElementById('otherPullFrom'+idx)?.value || '';
+  }
+  const pullFrom = pullFromRaw.toLowerCase().trim();
   if (!pullFrom) return;
   const currentVal = document.getElementById('product'+idx)?.value;
   if (currentVal && currentVal !== '') return;
