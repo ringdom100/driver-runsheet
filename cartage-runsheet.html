@@ -458,9 +458,10 @@
     <div class="card">
       <div class="row-2">
         <div class="field">
-          <label>Driver ID</label>
-          <input type="number" id="driverID" placeholder="e.g. 278" inputmode="numeric"
-                 oninput="updateProgress()">
+          <label>Driver ID <span class="req">*</span></label>
+          <input type="text" id="driverID" placeholder="e.g. 9205" inputmode="numeric"
+                 oninput="lookupDriver(); updateProgress()" autocomplete="off">
+          <div class="field-error" id="err-driverID">Please enter your Driver ID</div>
         </div>
         <div class="field">
           <label>Date <span class="auto-tag">✓ Auto</span></label>
@@ -468,75 +469,16 @@
         </div>
       </div>
       <div class="field">
-        <label>Driver Name (First &amp; Last) <span class="req">*</span></label>
-        <select id="driverName" onchange="validateField(this); updateProgress()">
-          <option value="">— Select your name —</option>
-          <option>Aaron Mitchell</option>
-          <option>Adam Clarke</option>
-          <option>Adrian Wells</option>
-          <option>Alex Thompson</option>
-          <option>Andrew Davis</option>
-          <option>Anthony Brown</option>
-          <option>Ben Harris</option>
-          <option>Brad Wilson</option>
-          <option>Brett Anderson</option>
-          <option>Cameron Taylor</option>
-          <option>Chris Walker</option>
-          <option>Craig Johnson</option>
-          <option>Dale Robinson</option>
-          <option>Daniel White</option>
-          <option>Darren Martin</option>
-          <option>Dave Thompson</option>
-          <option>David Lee</option>
-          <option>Dean Evans</option>
-          <option>Dylan Cooper</option>
-          <option>Ethan Scott</option>
-          <option>Gavin Hughes</option>
-          <option>Glen Morris</option>
-          <option>Grant Parker</option>
-          <option>Hayden Collins</option>
-          <option>Jack Turner</option>
-          <option>Jackson Edwards</option>
-          <option>Jake Stewart</option>
-          <option>James Murphy</option>
-          <option>Jason Campbell</option>
-          <option>Joel Mitchell</option>
-          <option>John Kelly</option>
-          <option>Jordan Bailey</option>
-          <option>Josh Watson</option>
-          <option>Justin Rivera</option>
-          <option>Karl Peterson</option>
-          <option>Kevin Cox</option>
-          <option>Liam Foster</option>
-          <option>Luke Gray</option>
-          <option>Mark Henderson</option>
-          <option>Matt Ferguson</option>
-          <option>Michael Bennett</option>
-          <option>Nathan Wood</option>
-          <option>Nick Long</option>
-          <option>Paul Barnes</option>
-          <option>Peter Ross</option>
-          <option>Phil Jenkins</option>
-          <option>Ray Richardson</option>
-          <option>Rhys Perry</option>
-          <option>Rick Powell</option>
-          <option>Rob Butler</option>
-          <option>Ryan Murphy</option>
-          <option>Sam Simmons</option>
-          <option>Scott Griffin</option>
-          <option>Shane Reed</option>
-          <option>Simon Cook</option>
-          <option>Steve Morgan</option>
-          <option>Tim Bailey</option>
-          <option>Todd Russell</option>
-          <option>Tom Brooks</option>
-          <option>Troy Sanders</option>
-          <option>Ty Skinner</option>
-          <option>Tyler Flores</option>
-          <option>Wayne Coleman</option>
-          <option>Other / Not Listed</option>
-        </select>
-        <div class="field-error" id="err-driverName">Please select your name</div>
+        <label>Driver Name <span class="auto-tag">✓ Auto-verified</span></label>
+        <input type="text" id="driverName" readonly placeholder="Will appear once Driver ID is entered"
+               style="font-weight:600;">
+        <div id="driverIdWarning" style="display:none; margin-top:6px; background:#fef2f2; border:1px solid #fecaca; border-radius:6px; padding:9px 12px; font-size:12px; color:#dc2626; line-height:1.5;">
+          ⚠️ Driver ID not recognised. Please check the number and try again, or contact the office.
+        </div>
+        <div id="driverIdOk" style="display:none; margin-top:6px; background:#f0fdf4; border:1px solid #bbf7d0; border-radius:6px; padding:9px 12px; font-size:12px; color:#16a34a; line-height:1.5;">
+          ✓ Driver verified
+        </div>
+        <div class="field-error" id="err-driverName">Driver ID must be verified before submitting</div>
       </div>
       <div class="row-2">
         <div class="field">
@@ -776,6 +718,48 @@
 <script>
 // ── CONFIG ──────────────────────────────────────────────────
 const SUBMIT_URL = 'YOUR_POWER_AUTOMATE_URL_HERE';
+
+// ── DRIVER LOOKUP TABLE ─────────────────────────────────────
+// Driver ID -> Full Name. Update this list when staff changes occur.
+const DRIVER_LOOKUP = {"9205":"Daniel Mcintosh","9208":"James Boasman","9209":"Shibeshi Asqedom","9210":"Patrick Doyle","9211":"Richard Lineham","9213":"Brett Austin","9216":"Damien Lowry","9220":"Michael Bland","9223":"Mesud Keskic","9225":"Surat Singh","9226":"Pankajdeep Singh","9227":"Jaibaaz Singh","9229":"Joga Singh 500741","9230":"Emmanuel Bugeja","9231":"Radek Hermanek","9233":"Mohit Gulati","9234":"Gurhimat Singh","9235":"Kent Wells","9238":"Gurpreet Singh","9239":"Dean Emery","9240":"Hardeep Singh","9242":"Ervin Agalliu","9243":"Jason Thompson","9245":"Mark Kinash","9247":"Jason Mead","9253":"Abdel Beitsayah","9254":"Farid Amouri","9260":"Arashdeep Singh Brar","9261":"Lachlan Grant","9263":"Brendon Derwin","9265":"Craig Macgregor","9266":"Lindsay Jack","9268":"Parwinder Pal Singh","9272":"Gurpreet Singh Rana","9273":"Bayram Kaykisiz","9275":"Amandeep Sarao","9280":"Jagraj Singh","9281":"Parminder Singh","9283":"Paul James","9286":"Neville Palmer","9287":"Gurjot Singh 501201","9288":"Luke Shortis","9289":"Mafi Pese","9290":"Jaspreet Singh 501222","9293":"Thomas John","9294":"Robert Kovac","9297":"Manpreet Singh 501244","9298":"Jarrod Hauser","9299":"Navsangeet Singh","9301":"Varinder Singh","9303":"Rohan Taylor","9305":"Viraj Samaranayake","9306":"Michael Sawdon","9309":"Malinderjeet Hira","9311":"Amrinder Singh 501305","9313":"Vikasjeet Rana","9314":"Dapinder Jawanda","9316":"Wayne Collier","9318":"James Heyden","9320":"Sililo Elia","9321":"Harmanjit Sekhon","9322":"Pokoina Tiaiti","9324":"Dharani Sai Aluri","9326":"Scott Allen","9327":"Aleksandar Tan","9328":"Jaspreet Singh 501399","9329":"Brennan Pell","9330":"Jasvir Pannu","9333":"Manpreet Singh 501405","9335":"Taulagi Johnson","9336":"Tarsem Singh","9337":"Sanampreet Singh","9338":"Jatindeep Gujral","9339":"Jaswant Dhaliwal","9340":"Andrew Jopp","9346":"Simon Haslett","9347":"Davood Zolfaghari","9348":"James (Jim) Spiers","9349":"Benjamin Bardzinski","9350":"Amandeep Singh 501450","9352":"Gavin Langton","9353":"Mussa Ali","9356":"Amandeep Singh 501463","9357":"Dwight Neville","9358":"Karandeep Singh","9359":"Rajinderpal Singh","9361":"Tarlok Singh","9363":"Kuldip Singh Maan","9366":"Zakaria Dor","9367":"Satinder Singh","9372":"Jasbir Singh","9376":"Andrew Mclean","9386":"Sam Sboto","9392":"Gurpreet Singh Sidhu","9394":"Utoikamanu Afemui","9397":"Amandip Singh","9399":"Palwinder Singh Aulakh","9402":"Rahul Gandhi","9404":"Steve Siania","9406":"Rajat Mittal","9409":"Richard Adamson","9413":"Rodney Palmer","9417":"Jamie Wassell","9418":"Timbira Kago","9420":"Samuel Hastings","9424":"Tavita Mauigoa","9425":"Shamsher Singh","9427":"Sunil Bishnoi","9428":"Kanwarpal Singh","9429":"Beljeek Ajang Agour Lual","9431":"Mohammad Nazif","9433":"Hassan Latif","9436":"Simranpreet Singh","9438":"Richard Clarke","9447":"Amrit Pal Singh","9450":"Harold Paskins","9452":"Amrinder Singh 501693","9455":"Danny Komorr","9457":"Ian Price","9459":"George Mamatis","9462":"Bhupinder Singh 501704","9469":"Julie Heke","9472":"Gurjeet Dhaliwal","9475":"Davinder Randhawa","9482":"Jatin Kataria","10575532":"Das Harpreet Singh","10575829":"Sukhvir Singh","10584806":"Ashish Bhandari","10584809":"Vilmos Kovac","10584814":"Dane Barlow","10584819":"Dayle Pitcon","10650955":"Ramanvir Singh Mann","10651671":"Corey Bisognin","10725838":"Rohitendra Nand","10788707":"Manpreet Singh 501769","10797642":"Satnamsingh Saini","10804706":"Paramjit Singh","10812525":"Rafal Pendecki","10871172":"Raminder Sandhu","10873599":"Mandeep Singh 501461","10949824":"Abraham Schultink","11155574":"Jake White","11653014":"John Marinas","11676881":"Himanshu Joshi","11716936":"Kieth Hansen","11734401":"Paul Koolen","11757228":"Rampreet Sidhu","11762513":"Anthony George","11765605":"Varinder Pal","11766636":"Harjot Attri","11775324":"Colin Ginn","11793080":"Simon Stalman","11807587":"Mohammed Ahsad","11898702":"Andrew Coad","11928367":"Sukhwinder Singh","11946764":"Dishant Patel","11950045":"Jaspreet Singh 501844","11958790":"Jared Biggs","11964251":"Pawan Kumar","11995578":"Clint Armstrong","12017450":"Shivam Gupta","12052198":"Harbhinder Singh","12084963":"Blake Johns","12086064":"Harpreet Singh","12088561":"John Bardsley","12094156":"Satnam Singh","12120277":"Imitiaz Shah","12156254":"Mark Boys","12171647":"Michael Van Breda-Foxwell","12286142":"Aseem Pal Utreja","12408043":"Paul Edwards","12614156":"Jasmin Hawksworth","12655316":"Gagandeep Singh Aulakh","12714773":"Jarrod Hicks","12772672":"Harwinder Marar","12787893":"Ruzzell Bondoc","12792496":"Jordan Rihs","12819448":"Amandeep Singh Sarao 501901","12834045":"Maninderjeet Garcha","12851435":"Allan Munsie","12871850":"Gurwinder Singh","12909716":"Marty Watson","12912252":"Greg Brownsey","12949570":"Michael Van Rijswijk","12955979":"Ronald Deane","12983347":"Ali Haider","12990746":"Harinderjit Singh Mann","13009829":"Sukhmandeep S Sidhu","13040038":"John O'Sullivan","13052226":"Jamaluddin Ibrahimi","13072626":"Nathan Streeter","13092007":"Buenaventura Jay Velasco","13272033":"Abubakar Abdirahman","13273774":"Sada Deo","13300871":"Andrew Kirkwood","13442799":"Amarprit Singh","13479336":"Rupinder Masson","13479618":"John Kurian","13487717":"Randeep Dhillon","13519443":"Parvinder Singh Sandhu","13542180":"Sourabh -","13591334":"Gregory Collins","13630502":"Gurpreet Singh 801948","13631969":"Amrinder Singh Randhawa","13644650":"Lisa Pollard"};
+
+let verifiedDriverName = null;
+
+function lookupDriver() {
+  const idInput = document.getElementById('driverID');
+  const id = idInput.value.trim();
+  const nameField = document.getElementById('driverName');
+  const warningEl = document.getElementById('driverIdWarning');
+  const okEl = document.getElementById('driverIdOk');
+  const errEl = document.getElementById('err-driverName');
+
+  if (!id) {
+    nameField.value = '';
+    verifiedDriverName = null;
+    warningEl.style.display = 'none';
+    okEl.style.display = 'none';
+    idInput.classList.remove('valid','error');
+    return;
+  }
+
+  const match = DRIVER_LOOKUP[id];
+  if (match) {
+    nameField.value = match;
+    verifiedDriverName = match;
+    warningEl.style.display = 'none';
+    okEl.style.display = 'block';
+    idInput.classList.add('valid');
+    idInput.classList.remove('error');
+    errEl.classList.remove('show');
+  } else {
+    nameField.value = '';
+    verifiedDriverName = null;
+    warningEl.style.display = 'block';
+    okEl.style.display = 'none';
+    idInput.classList.add('error');
+    idInput.classList.remove('valid');
+  }
+}
 
 // ── STATE ────────────────────────────────────────────────────
 let loadCount = 0;
@@ -1158,7 +1142,7 @@ function validateField(el) {
 
 // ── PROGRESS ──────────────────────────────────────────────
 function updateProgress() {
-  const baseFields = ['driverName','truckNo','truckRego','depot','startTime','finishTime','odometer'];
+  const baseFields = ['driverID','truckNo','truckRego','depot','startTime','finishTime','odometer'];
   let filled = 0, total = baseFields.length + 4;
   baseFields.forEach(id => { const el=document.getElementById(id); if(el&&el.value.trim()!=='') filled++; });
   if (photoData.runSheet) filled++;
@@ -1179,8 +1163,14 @@ function updateProgress() {
 // ── SUBMIT ────────────────────────────────────────────────
 function submitForm() {
   const errors = [];
+
+  if (!verifiedDriverName) {
+    document.getElementById('driverID').classList.add('error');
+    document.getElementById('err-driverName').classList.add('show');
+    errors.push('A valid, verified Driver ID');
+  }
+
   const required = [
-    {id:'driverName',label:'Driver Name'},
     {id:'truckNo',label:'Truck Number'},
     {id:'truckRego',label:'Truck Rego'},
     {id:'depot',label:'Depot'},
@@ -1294,6 +1284,9 @@ function resetForm() {
    'break1Start','break1Dur','break2Start','break2Dur','break3Start','break3Dur','break4Start','break4Dur'].forEach(id => {
     const el=document.getElementById(id); if(el){el.value='';el.classList.remove('error','valid');}
   });
+  verifiedDriverName = null;
+  document.getElementById('driverIdWarning').style.display='none';
+  document.getElementById('driverIdOk').style.display='none';
   setTodayDate();
   photoData.runSheet=null; photoData.dockets=Array(NUM_DOCKETS).fill(null);
   blurStatus.runSheet=null; blurStatus.dockets=Array(NUM_DOCKETS).fill(null);
@@ -1309,8 +1302,7 @@ function resetForm() {
   window.scrollTo(0,0);
 }
 
-
-// u2500u2500 PRODUCT AUTO-MATCH u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500
+// ── PRODUCT AUTO-MATCH ──────────────────────────────────────
 const LOCATION_PRODUCT_MAP = [
   { keywords: ['point wilson'], products: ['MVQ Point Wilson 14mm','MVQ Point Wilson 20mm','Point Wilson 20mm','Point Wilson 14mm'] },
   { keywords: ['lysterfield'], products: ['Boral Lysterfield 14mm','Boral Lysterfield 20mm','Hanson Lysterfield 14mm','Hanson Lysterfield 20mm'] },
