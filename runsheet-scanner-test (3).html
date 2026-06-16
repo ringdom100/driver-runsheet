@@ -244,9 +244,26 @@ async function runOCR(dataUrl) {
 function buildPrompt() {
   return `You are reading a handwritten Cartage Australia driver run sheet. Extract the data into strict JSON only, no markdown fences, no preamble.
 
-Read carefully - these are handwritten, often messy, sometimes with crossed-out corrections (trust the value in the actual printed field box, ignore stray marginal scribbles), AM/PM tick boxes instead of written text, and abbreviated location names (e.g. "D/Rd" = Devon Road, "Trug" = Truganina, "S/U" = Stick up).
+CRITICAL ACCURACY RULES FOR NUMBERS:
+Long numbers (6+ digits, like odometer/kms readings) and alphanumeric codes (like docket numbers) are the most common source of misreads. For every numeric or alphanumeric field, follow this process before writing your final answer:
+1. Locate the exact handwritten characters in their field box.
+2. Count the digits/characters one at a time, left to right, out loud in your reasoning.
+3. Re-look at the image and re-count to confirm the same count and same characters.
+4. Only then write the value. Never guess a "rounder" or "shorter" number than what is actually written - if you see 6 digits, write all 6, even if the number looks unusually large.
 
-For every field, give a confidence rating: "high" if clearly legible, "medium" if you had to interpret, "low" if genuinely uncertain or illegible. If a field is blank on the sheet, return empty string and confidence "high".
+FIELD-SPECIFIC EXPECTATIONS based on this exact run sheet template:
+- Kms Start and Kms Finish are odometer readings and are typically 5-7 digits long (e.g. 410111 or 410111.6). Do not truncate or drop digits. Read every digit individually.
+- Truck No is typically 3 digits (e.g. 326, 304, 367). Read each digit separately - do not let nearby numbers (like Driver ID, which is a different field elsewhere on the sheet) bleed into this reading.
+- Docket Number (sometimes printed "Ticket No") is an alphanumeric code, often a mix of 1-3 letters followed by digits (e.g. NY120405, 24089128, 302931). Carefully distinguish letters from numbers - a handwritten "N" can look like an "M", a "0" can look like an "O", a "1" can look like an "I" or "7". Read the actual shape of each character, do not assume it must be all-digits.
+- Gross, Tare, and Net are weights in tonnes, normally 2 digits before the decimal and 2 after (e.g. 45.12, 16.56, 28.56). If only two of the three are filled in, the third is genuinely blank - do not calculate or guess it.
+
+OTHER READING NOTES:
+- These are handwritten, often messy, sometimes with crossed-out corrections. Trust the value in the actual printed field box; ignore stray marginal scribbles or numbers written outside the ruled boxes (e.g. corrections scrawled in the margin).
+- Some versions of this form use AM/PM tick boxes instead of written time text for Start Time and Finish Time - read the ticked box and report time as e.g. "8:00 AM".
+- Locations are often abbreviated (e.g. "D/Rd" = Devon Road, "Trug" = Truganina, "S/U" = Stick up, "P/up" = Pick up).
+
+CONFIDENCE RATING:
+For every field, give a confidence rating: "high" only if you are genuinely certain after the digit-by-digit check above, "medium" if you had to interpret unclear handwriting, "low" if genuinely uncertain or illegible. If a field is blank on the sheet, return empty string and confidence "high" (a confident blank is not a guess).
 
 Return exactly this JSON shape:
 {
