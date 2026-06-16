@@ -418,6 +418,176 @@
     padding: 3px 8px; border-radius: 4px; cursor: pointer;
   }
   .sig-hint { font-size: 11px; color: var(--muted); margin-top: 5px; }
+
+  /* TIME PICKER TRIGGER */
+  .time-picker-trigger {
+    width: 100%;
+    background: #f8fafc;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .time-picker-trigger::before {
+    content: '🕐';
+    font-size: 14px;
+    opacity: 0.5;
+  }
+  .time-picker-trigger:active { background: var(--white); border-color: var(--orange); }
+  .time-picker-trigger.small { padding: 11px 13px; font-size: 15px; }
+  .time-picker-trigger.filled { color: var(--text); border-color: var(--green); }
+  .time-picker-trigger.error { border-color: var(--red) !important; }
+  .time-picker-placeholder { color: var(--muted); font-weight: 400; }
+
+  /* TIME PICKER MODAL */
+  .time-picker-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(15,23,42,0.5);
+    z-index: 500;
+    align-items: flex-end;
+    justify-content: center;
+  }
+  .time-picker-overlay.show { display: flex; }
+  .time-picker-sheet {
+    width: 100%;
+    max-width: 480px;
+    background: var(--white);
+    border-radius: 20px 20px 0 0;
+    padding: 18px 0 0;
+    animation: slideUp 0.25s ease;
+  }
+  @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+  .time-picker-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px 14px;
+    border-bottom: 1px solid var(--border);
+  }
+  .time-picker-header h3 { font-size: 15px; font-weight: 700; color: var(--navy); }
+  .time-picker-cancel, .time-picker-done {
+    font-size: 15px;
+    font-weight: 600;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 6px 4px;
+  }
+  .time-picker-cancel { color: var(--label); }
+  .time-picker-done { color: var(--orange-dk); font-weight: 800; }
+
+  .time-picker-body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 16px 0 24px;
+    position: relative;
+  }
+  .time-picker-selection-band {
+    position: absolute;
+    left: 16px;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 44px;
+    background: #fff7ed;
+    border-top: 1.5px solid var(--orange);
+    border-bottom: 1.5px solid var(--orange);
+    pointer-events: none;
+    z-index: 1;
+  }
+  .time-wheel-col {
+    height: 220px;
+    overflow-y: scroll;
+    scroll-snap-type: y mandatory;
+    -webkit-overflow-scrolling: touch;
+    position: relative;
+    z-index: 2;
+    scrollbar-width: none;
+  }
+  .time-wheel-col::-webkit-scrollbar { display: none; }
+  .time-wheel-col-inner {
+    padding: 88px 0;
+  }
+  .time-wheel-item {
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 21px;
+    font-weight: 500;
+    color: var(--muted);
+    scroll-snap-align: center;
+    transition: color 0.15s, font-weight 0.15s, transform 0.15s;
+    font-variant-numeric: tabular-nums;
+  }
+  .time-wheel-item.selected {
+    color: var(--navy);
+    font-weight: 800;
+    font-size: 23px;
+  }
+  .time-wheel-hours { width: 70px; text-align: right; }
+  .time-wheel-hours .time-wheel-col-inner { padding-right: 4px; }
+  .time-wheel-minutes { width: 70px; text-align: left; }
+  .time-wheel-separator {
+    font-size: 23px;
+    font-weight: 800;
+    color: var(--navy);
+    width: 16px;
+    text-align: center;
+    z-index: 2;
+  }
+  .time-wheel-ampm {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-left: 14px;
+    z-index: 2;
+  }
+  .ampm-btn {
+    width: 52px;
+    padding: 9px 0;
+    text-align: center;
+    border-radius: 8px;
+    border: 1.5px solid var(--border);
+    background: var(--white);
+    color: var(--label);
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .ampm-btn.active {
+    background: var(--orange);
+    border-color: var(--orange);
+    color: var(--white);
+  }
+
+  .time-quick-presets {
+    display: flex;
+    gap: 8px;
+    padding: 0 20px 18px;
+    flex-wrap: wrap;
+  }
+  .preset-chip {
+    background: #f1f5f9;
+    border: none;
+    border-radius: 20px;
+    padding: 7px 14px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--label);
+    cursor: pointer;
+  }
+  .preset-chip:active { background: #e2e8f0; }
 </style>
 </head>
 <body>
@@ -522,14 +692,18 @@
       <div class="row-2">
         <div class="field">
           <label>Start Time <span class="req">*</span></label>
-          <input type="time" id="startTime"
-                 oninput="validateField(this); calcTotalHours(); updateProgress()">
+          <div class="time-picker-trigger" id="startTime_trigger" onclick="openTimePicker('startTime')">
+            <span id="startTime_display" class="time-picker-placeholder">Tap to set time</span>
+          </div>
+          <input type="hidden" id="startTime">
           <div class="field-error" id="err-startTime">Required</div>
         </div>
         <div class="field">
           <label>Finish Time <span class="req">*</span></label>
-          <input type="time" id="finishTime"
-                 oninput="validateField(this); calcTotalHours(); updateProgress()">
+          <div class="time-picker-trigger" id="finishTime_trigger" onclick="openTimePicker('finishTime')">
+            <span id="finishTime_display" class="time-picker-placeholder">Tap to set time</span>
+          </div>
+          <input type="hidden" id="finishTime">
           <div class="field-error" id="err-finishTime">Required</div>
         </div>
       </div>
@@ -578,7 +752,10 @@
         <div class="break-label">1st Break</div>
         <div class="field" style="margin:0">
           <label>Start</label>
-          <input type="time" id="break1Start">
+          <div class="time-picker-trigger small" id="break1Start_trigger" onclick="openTimePicker('break1Start')">
+            <span id="break1Start_display" class="time-picker-placeholder">Set time</span>
+          </div>
+          <input type="hidden" id="break1Start">
         </div>
         <div class="field" style="margin:0">
           <label>Duration (min)</label>
@@ -589,7 +766,10 @@
         <div class="break-label">2nd Break</div>
         <div class="field" style="margin:0">
           <label>Start</label>
-          <input type="time" id="break2Start">
+          <div class="time-picker-trigger small" id="break2Start_trigger" onclick="openTimePicker('break2Start')">
+            <span id="break2Start_display" class="time-picker-placeholder">Set time</span>
+          </div>
+          <input type="hidden" id="break2Start">
         </div>
         <div class="field" style="margin:0">
           <label>Duration (min)</label>
@@ -600,7 +780,10 @@
         <div class="break-label">3rd Break</div>
         <div class="field" style="margin:0">
           <label>Start</label>
-          <input type="time" id="break3Start">
+          <div class="time-picker-trigger small" id="break3Start_trigger" onclick="openTimePicker('break3Start')">
+            <span id="break3Start_display" class="time-picker-placeholder">Set time</span>
+          </div>
+          <input type="hidden" id="break3Start">
         </div>
         <div class="field" style="margin:0">
           <label>Duration (min)</label>
@@ -611,7 +794,10 @@
         <div class="break-label">4th Break</div>
         <div class="field" style="margin:0">
           <label>Start</label>
-          <input type="time" id="break4Start">
+          <div class="time-picker-trigger small" id="break4Start_trigger" onclick="openTimePicker('break4Start')">
+            <span id="break4Start_display" class="time-picker-placeholder">Set time</span>
+          </div>
+          <input type="hidden" id="break4Start">
         </div>
         <div class="field" style="margin:0">
           <label>Duration (min)</label>
@@ -713,6 +899,38 @@
     <strong id="refNumber">—</strong>
   </div>
   <button class="new-submission-btn" onclick="resetForm()">Submit Another Run Sheet</button>
+</div>
+
+<!-- TIME PICKER MODAL -->
+<div class="time-picker-overlay" id="timePickerOverlay" onclick="if(event.target===this) closeTimePicker()">
+  <div class="time-picker-sheet">
+    <div class="time-picker-header">
+      <button class="time-picker-cancel" onclick="closeTimePicker()">Cancel</button>
+      <h3 id="timePickerTitle">Set Time</h3>
+      <button class="time-picker-done" onclick="confirmTimePicker()">Done</button>
+    </div>
+    <div class="time-quick-presets">
+      <button class="preset-chip" onclick="setPresetTime(6,0,'AM')">6:00 AM</button>
+      <button class="preset-chip" onclick="setPresetTime(7,0,'AM')">7:00 AM</button>
+      <button class="preset-chip" onclick="setPresetTime(12,0,'PM')">12:00 PM</button>
+      <button class="preset-chip" onclick="setPresetTime(5,0,'PM')">5:00 PM</button>
+      <button class="preset-chip" onclick="setPresetTimeNow()">Now</button>
+    </div>
+    <div class="time-picker-body">
+      <div class="time-picker-selection-band"></div>
+      <div class="time-wheel-col time-wheel-hours" id="hourWheel">
+        <div class="time-wheel-col-inner" id="hourWheelInner"></div>
+      </div>
+      <div class="time-wheel-separator">:</div>
+      <div class="time-wheel-col time-wheel-minutes" id="minuteWheel">
+        <div class="time-wheel-col-inner" id="minuteWheelInner"></div>
+      </div>
+      <div class="time-wheel-ampm">
+        <button class="ampm-btn" id="amBtn" onclick="setAmPm('AM')">AM</button>
+        <button class="ampm-btn" id="pmBtn" onclick="setAmPm('PM')">PM</button>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -931,11 +1149,17 @@ function addLoad() {
       <div class="row-2">
         <div class="field">
           <label>Arrive (Customer)</label>
-          <input type="time" id="arrive${idx}">
+          <div class="time-picker-trigger" id="arrive${idx}_trigger" onclick="openTimePicker('arrive${idx}')">
+            <span id="arrive${idx}_display" class="time-picker-placeholder">Tap to set time</span>
+          </div>
+          <input type="hidden" id="arrive${idx}">
         </div>
         <div class="field">
           <label>Depart (Customer)</label>
-          <input type="time" id="depart${idx}">
+          <div class="time-picker-trigger" id="depart${idx}_trigger" onclick="openTimePicker('depart${idx}')">
+            <span id="depart${idx}_display" class="time-picker-placeholder">Tap to set time</span>
+          </div>
+          <input type="hidden" id="depart${idx}">
         </div>
       </div>
       ${idx > 1 ? `<button onclick="removeLoad(${idx})" style="margin-top:8px;background:transparent;border:1px solid #fecaca;color:#dc2626;font-size:12px;font-weight:600;padding:6px 14px;border-radius:6px;cursor:pointer;">Remove Load ${idx}</button>` : ''}
@@ -1017,6 +1241,177 @@ function clearSignature() {
 
 function getSignatureDataUrl() {
   return hasSig ? sigCanvas.toDataURL('image/png') : null;
+}
+
+// ── WHEEL TIME PICKER ───────────────────────────────────────
+const ITEM_H = 44;
+let activeTimeFieldId = null;
+let pickerHour = 7;     // 1-12
+let pickerMinute = 0;   // 0-59
+let pickerAmPm = 'AM';
+let hourScrollTimer, minuteScrollTimer;
+
+function buildWheelOptions() {
+  const hourInner = document.getElementById('hourWheelInner');
+  const minuteInner = document.getElementById('minuteWheelInner');
+  hourInner.innerHTML = '';
+  minuteInner.innerHTML = '';
+  for (let h = 1; h <= 12; h++) {
+    const div = document.createElement('div');
+    div.className = 'time-wheel-item';
+    div.textContent = h;
+    div.dataset.value = h;
+    hourInner.appendChild(div);
+  }
+  for (let m = 0; m < 60; m++) {
+    const div = document.createElement('div');
+    div.className = 'time-wheel-item';
+    div.textContent = String(m).padStart(2,'0');
+    div.dataset.value = m;
+    minuteInner.appendChild(div);
+  }
+}
+
+function openTimePicker(fieldId) {
+  activeTimeFieldId = fieldId;
+  buildWheelOptions();
+
+  const hiddenInput = document.getElementById(fieldId);
+  const existing = hiddenInput ? hiddenInput.value : '';
+
+  if (existing) {
+    const [hh, mm] = existing.split(':').map(Number);
+    pickerAmPm = hh >= 12 ? 'PM' : 'AM';
+    pickerHour = hh % 12 === 0 ? 12 : hh % 12;
+    pickerMinute = mm;
+  } else {
+    const now = new Date();
+    let hh = now.getHours();
+    pickerAmPm = hh >= 12 ? 'PM' : 'AM';
+    pickerHour = hh % 12 === 0 ? 12 : hh % 12;
+    pickerMinute = Math.round(now.getMinutes()/5)*5 % 60;
+  }
+
+  const labelMap = {
+    startTime: 'Start Time', finishTime: 'Finish Time',
+    break1Start: '1st Break Start', break2Start: '2nd Break Start',
+    break3Start: '3rd Break Start', break4Start: '4th Break Start',
+  };
+  let title = labelMap[fieldId];
+  if (!title) {
+    if (fieldId.startsWith('arrive')) title = 'Arrive (Customer)';
+    else if (fieldId.startsWith('depart')) title = 'Depart (Customer)';
+    else title = 'Set Time';
+  }
+  document.getElementById('timePickerTitle').textContent = title;
+
+  document.getElementById('timePickerOverlay').classList.add('show');
+
+  setTimeout(() => {
+    scrollWheelTo('hourWheel', pickerHour - 1, false);
+    scrollWheelTo('minuteWheel', pickerMinute, false);
+    updateAmPmButtons();
+    attachWheelListeners();
+    highlightSelected();
+  }, 20);
+}
+
+function closeTimePicker() {
+  document.getElementById('timePickerOverlay').classList.remove('show');
+  activeTimeFieldId = null;
+}
+
+function scrollWheelTo(wheelId, index, smooth) {
+  const wheel = document.getElementById(wheelId);
+  wheel.scrollTo({ top: index * ITEM_H, behavior: smooth ? 'smooth' : 'auto' });
+}
+
+function attachWheelListeners() {
+  const hourWheel = document.getElementById('hourWheel');
+  const minuteWheel = document.getElementById('minuteWheel');
+
+  hourWheel.onscroll = () => {
+    clearTimeout(hourScrollTimer);
+    hourScrollTimer = setTimeout(() => {
+      const idx = Math.round(hourWheel.scrollTop / ITEM_H);
+      pickerHour = idx + 1;
+      scrollWheelTo('hourWheel', idx, true);
+      highlightSelected();
+    }, 80);
+  };
+
+  minuteWheel.onscroll = () => {
+    clearTimeout(minuteScrollTimer);
+    minuteScrollTimer = setTimeout(() => {
+      const idx = Math.round(minuteWheel.scrollTop / ITEM_H);
+      pickerMinute = idx;
+      scrollWheelTo('minuteWheel', idx, true);
+      highlightSelected();
+    }, 80);
+  };
+}
+
+function highlightSelected() {
+  document.querySelectorAll('#hourWheelInner .time-wheel-item').forEach(el => {
+    el.classList.toggle('selected', parseInt(el.dataset.value) === pickerHour);
+  });
+  document.querySelectorAll('#minuteWheelInner .time-wheel-item').forEach(el => {
+    el.classList.toggle('selected', parseInt(el.dataset.value) === pickerMinute);
+  });
+}
+
+function setAmPm(val) {
+  pickerAmPm = val;
+  updateAmPmButtons();
+}
+
+function updateAmPmButtons() {
+  document.getElementById('amBtn').classList.toggle('active', pickerAmPm === 'AM');
+  document.getElementById('pmBtn').classList.toggle('active', pickerAmPm === 'PM');
+}
+
+function setPresetTime(h, m, ampm) {
+  pickerHour = h; pickerMinute = m; pickerAmPm = ampm;
+  scrollWheelTo('hourWheel', h - 1, true);
+  scrollWheelTo('minuteWheel', m, true);
+  updateAmPmButtons();
+  highlightSelected();
+}
+
+function setPresetTimeNow() {
+  const now = new Date();
+  let hh = now.getHours();
+  const ampm = hh >= 12 ? 'PM' : 'AM';
+  const h12 = hh % 12 === 0 ? 12 : hh % 12;
+  setPresetTime(h12, now.getMinutes(), ampm);
+}
+
+function confirmTimePicker() {
+  if (!activeTimeFieldId) return;
+  let hh24 = pickerHour % 12;
+  if (pickerAmPm === 'PM') hh24 += 12;
+  const hhStr = String(hh24).padStart(2,'0');
+  const mmStr = String(pickerMinute).padStart(2,'0');
+  const value24 = `${hhStr}:${mmStr}`;
+
+  const hiddenInput = document.getElementById(activeTimeFieldId);
+  if (hiddenInput) hiddenInput.value = value24;
+
+  const display = document.getElementById(`${activeTimeFieldId}_display`);
+  const trigger = document.getElementById(`${activeTimeFieldId}_trigger`);
+  if (display) {
+    display.textContent = `${pickerHour}:${mmStr} ${pickerAmPm}`;
+    display.classList.remove('time-picker-placeholder');
+  }
+  if (trigger) trigger.classList.add('filled');
+
+  const errEl = document.getElementById(`err-${activeTimeFieldId}`);
+  if (errEl) errEl.classList.remove('show');
+  if (trigger) trigger.classList.remove('error');
+
+  closeTimePicker();
+  calcTotalHours();
+  updateProgress();
 }
 
 // ── DOCKET GRID ───────────────────────────────────────────
@@ -1180,7 +1575,13 @@ function submitForm() {
   ];
   required.forEach(f => {
     const el = document.getElementById(f.id);
-    if (!el||!el.value.trim()) { el&&el.classList.add('error'); document.getElementById(`err-${f.id}`)?.classList.add('show'); errors.push(f.label); }
+    if (!el||!el.value.trim()) {
+      el&&el.classList.add('error');
+      const trigger = document.getElementById(`${f.id}_trigger`);
+      if (trigger) trigger.classList.add('error');
+      document.getElementById(`err-${f.id}`)?.classList.add('show');
+      errors.push(f.label);
+    }
   });
   // Validate load 1
   ['ticketNo1','pullFrom1','deliverTo1','tonnes1'].forEach((id,i) => {
@@ -1287,6 +1688,13 @@ function resetForm() {
   verifiedDriverName = null;
   document.getElementById('driverIdWarning').style.display='none';
   document.getElementById('driverIdOk').style.display='none';
+  // Reset all time picker triggers
+  ['startTime','finishTime','break1Start','break2Start','break3Start','break4Start'].forEach(id => {
+    const display = document.getElementById(`${id}_display`);
+    const trigger = document.getElementById(`${id}_trigger`);
+    if (display) { display.textContent = id.includes('break') ? 'Set time' : 'Tap to set time'; display.classList.add('time-picker-placeholder'); }
+    if (trigger) trigger.classList.remove('filled','error');
+  });
   setTodayDate();
   photoData.runSheet=null; photoData.dockets=Array(NUM_DOCKETS).fill(null);
   blurStatus.runSheet=null; blurStatus.dockets=Array(NUM_DOCKETS).fill(null);
