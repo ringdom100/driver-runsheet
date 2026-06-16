@@ -151,7 +151,73 @@
 </div>
 
 <script>
-const DRIVER_LOOKUP = {"9205":"Daniel Mcintosh","9208":"James Boasman","9209":"Shibeshi Asqedom","9210":"Patrick Doyle","9211":"Richard Lineham","9213":"Brett Austin","9216":"Damien Lowry","9220":"Michael Bland","9223":"Mesud Keskic","9225":"Surat Singh","6543":"Manu"};
+const NAME_LOOKUP = {"daniel mcintosh":{"id":"9205","properName":"Daniel Mcintosh"},"james boasman":{"id":"9208","properName":"James Boasman"},"shibeshi asqedom":{"id":"9209","properName":"Shibeshi Asqedom"},"patrick doyle":{"id":"9210","properName":"Patrick Doyle"},"richard lineham":{"id":"9211","properName":"Richard Lineham"},"brett austin":{"id":"9213","properName":"Brett Austin"},"damien lowry":{"id":"9216","properName":"Damien Lowry"},"michael bland":{"id":"9220","properName":"Michael Bland"},"mesud keskic":{"id":"9223","properName":"Mesud Keskic"},"surat singh":{"id":"9225","properName":"Surat Singh"},"pankajdeep singh":{"id":"9226","properName":"Pankajdeep Singh"},"jaibaaz singh":{"id":"9227","properName":"Jaibaaz Singh"},"joga singh 500741":{"id":"9229","properName":"Joga Singh 500741"},"emmanuel bugeja":{"id":"9230","properName":"Emmanuel Bugeja"},"radek hermanek":{"id":"9231","properName":"Radek Hermanek"},"mohit gulati":{"id":"9233","properName":"Mohit Gulati"},"gurhimat singh":{"id":"9234","properName":"Gurhimat Singh"},"kent wells":{"id":"9235","properName":"Kent Wells"},"gurpreet singh":{"id":"9238","properName":"Gurpreet Singh"},"dean emery":{"id":"9239","properName":"Dean Emery"},"hardeep singh":{"id":"9240","properName":"Hardeep Singh"},"ervin agalliu":{"id":"9242","properName":"Ervin Agalliu"},"jason thompson":{"id":"9243","properName":"Jason Thompson"},"mark kinash":{"id":"9245","properName":"Mark Kinash"},"jason mead":{"id":"9247","properName":"Jason Mead"},"abdel beitsayah":{"id":"9253","properName":"Abdel Beitsayah"},"farid amouri":{"id":"9254","properName":"Farid Amouri"},"arashdeep singh brar":{"id":"9260","properName":"Arashdeep Singh Brar"},"lachlan grant":{"id":"9261","properName":"Lachlan Grant"},"brendon derwin":{"id":"9263","properName":"Brendon Derwin"},"craig macgregor":{"id":"9265","properName":"Craig Macgregor"},"lindsay jack":{"id":"9266","properName":"Lindsay Jack"},"parwinder pal singh":{"id":"9268","properName":"Parwinder Pal Singh"},"gurpreet singh rana":{"id":"9272","properName":"Gurpreet Singh Rana"},"bayram kaykisiz":{"id":"9273","properName":"Bayram Kaykisiz"},"amandeep sarao":{"id":"9275","properName":"Amandeep Sarao"},"jagraj singh":{"id":"9280","properName":"Jagraj Singh"},"parminder singh":{"id":"9281","properName":"Parminder Singh"},"paul james":{"id":"9283","properName":"Paul James"},"neville palmer":{"id":"9286","properName":"Neville Palmer"},"gurjot singh 501201":{"id":"9287","properName":"Gurjot Singh 501201"},"luke shortis":{"id":"9288","properName":"Luke Shortis"},"mafi pese":{"id":"9289","properName":"Mafi Pese"},"jaspreet singh 501222":{"id":"9290","properName":"Jaspreet Singh 501222"},"thomas john":{"id":"9293","properName":"Thomas John"},"robert kovac":{"id":"9294","properName":"Robert Kovac"},"manpreet singh 501244":{"id":"9297","properName":"Manpreet Singh 501244"},"jarrod hauser":{"id":"9298","properName":"Jarrod Hauser"},"navsangeet singh":{"id":"9299","properName":"Navsangeet Singh"},"varinder singh":{"id":"9301","properName":"Varinder Singh"},"rohan taylor":{"id":"9303","properName":"Rohan Taylor"},"viraj samaranayake":{"id":"9305","properName":"Viraj Samaranayake"},"michael sawdon":{"id":"9306","properName":"Michael Sawdon"},"malinderjeet hira":{"id":"9309","properName":"Malinderjeet Hira"},"amrinder singh 501305":{"id":"9311","properName":"Amrinder Singh 501305"},"vikasjeet rana":{"id":"9313","properName":"Vikasjeet Rana"},"dapinder jawanda":{"id":"9314","properName":"Dapinder Jawanda"},"wayne collier":{"id":"9316","properName":"Wayne Collier"},"james heyden":{"id":"9318","properName":"James Heyden"},"sililo elia":{"id":"9320","properName":"Sililo Elia"},"harmanjit sekhon":{"id":"9321","properName":"Harmanjit Sekhon"},"pokoina tiaiti":{"id":"9322","properName":"Pokoina Tiaiti"},"dharani sai aluri":{"id":"9324","properName":"Dharani Sai Aluri"},"scott allen":{"id":"9326","properName":"Scott Allen"},"aleksandar tan":{"id":"9327","properName":"Aleksandar Tan"},"jaspreet singh 501399":{"id":"9328","properName":"Jaspreet Singh 501399"},"brennan pell":{"id":"9329","properName":"Brennan Pell"},"jasvir pannu":{"id":"9330","properName":"Jasvir Pannu"},"manpreet singh 501405":{"id":"9333","properName":"Manpreet Singh 501405"},"taulagi johnson":{"id":"9335","properName":"Taulagi Johnson"},"tarsem singh":{"id":"9336","properName":"Tarsem Singh"},"sanampreet singh":{"id":"9337","properName":"Sanampreet Singh"},"jatindeep gujral":{"id":"9338","properName":"Jatindeep Gujral"},"jaswant dhaliwal":{"id":"9339","properName":"Jaswant Dhaliwal"},"andrew jopp":{"id":"9340","properName":"Andrew Jopp"},"simon haslett":{"id":"9346","properName":"Simon Haslett"},"davood zolfaghari":{"id":"9347","properName":"Davood Zolfaghari"},"james (jim) spiers":{"id":"9348","properName":"James (Jim) Spiers"},"benjamin bardzinski":{"id":"9349","properName":"Benjamin Bardzinski"},"amandeep singh 501450":{"id":"9350","properName":"Amandeep Singh 501450"},"gavin langton":{"id":"9352","properName":"Gavin Langton"},"mussa ali":{"id":"9353","properName":"Mussa Ali"},"amandeep singh 501463":{"id":"9356","properName":"Amandeep Singh 501463"},"dwight neville":{"id":"9357","properName":"Dwight Neville"},"karandeep singh":{"id":"9358","properName":"Karandeep Singh"},"rajinderpal singh":{"id":"9359","properName":"Rajinderpal Singh"},"tarlok singh":{"id":"9361","properName":"Tarlok Singh"},"kuldip singh maan":{"id":"9363","properName":"Kuldip Singh Maan"},"zakaria dor":{"id":"9366","properName":"Zakaria Dor"},"satinder singh":{"id":"9367","properName":"Satinder Singh"},"jasbir singh":{"id":"9372","properName":"Jasbir Singh"},"andrew mclean":{"id":"9376","properName":"Andrew Mclean"},"sam sboto":{"id":"9386","properName":"Sam Sboto"},"gurpreet singh sidhu":{"id":"9392","properName":"Gurpreet Singh Sidhu"},"utoikamanu afemui":{"id":"9394","properName":"Utoikamanu Afemui"},"amandip singh":{"id":"9397","properName":"Amandip Singh"},"palwinder singh aulakh":{"id":"9399","properName":"Palwinder Singh Aulakh"},"rahul gandhi":{"id":"9402","properName":"Rahul Gandhi"},"steve siania":{"id":"9404","properName":"Steve Siania"},"rajat mittal":{"id":"9406","properName":"Rajat Mittal"},"richard adamson":{"id":"9409","properName":"Richard Adamson"},"rodney palmer":{"id":"9413","properName":"Rodney Palmer"},"jamie wassell":{"id":"9417","properName":"Jamie Wassell"},"timbira kago":{"id":"9418","properName":"Timbira Kago"},"samuel hastings":{"id":"9420","properName":"Samuel Hastings"},"tavita mauigoa":{"id":"9424","properName":"Tavita Mauigoa"},"shamsher singh":{"id":"9425","properName":"Shamsher Singh"},"sunil bishnoi":{"id":"9427","properName":"Sunil Bishnoi"},"kanwarpal singh":{"id":"9428","properName":"Kanwarpal Singh"},"beljeek ajang agour lual":{"id":"9429","properName":"Beljeek Ajang Agour Lual"},"mohammad nazif":{"id":"9431","properName":"Mohammad Nazif"},"hassan latif":{"id":"9433","properName":"Hassan Latif"},"simranpreet singh":{"id":"9436","properName":"Simranpreet Singh"},"richard clarke":{"id":"9438","properName":"Richard Clarke"},"amrit pal singh":{"id":"9447","properName":"Amrit Pal Singh"},"harold paskins":{"id":"9450","properName":"Harold Paskins"},"amrinder singh 501693":{"id":"9452","properName":"Amrinder Singh 501693"},"danny komorr":{"id":"9455","properName":"Danny Komorr"},"ian price":{"id":"9457","properName":"Ian Price"},"george mamatis":{"id":"9459","properName":"George Mamatis"},"bhupinder singh 501704":{"id":"9462","properName":"Bhupinder Singh 501704"},"julie heke":{"id":"9469","properName":"Julie Heke"},"gurjeet dhaliwal":{"id":"9472","properName":"Gurjeet Dhaliwal"},"davinder randhawa":{"id":"9475","properName":"Davinder Randhawa"},"jatin kataria":{"id":"9482","properName":"Jatin Kataria"},"das harpreet singh":{"id":"10575532","properName":"Das Harpreet Singh"},"sukhvir singh":{"id":"10575829","properName":"Sukhvir Singh"},"ashish bhandari":{"id":"10584806","properName":"Ashish Bhandari"},"vilmos kovac":{"id":"10584809","properName":"Vilmos Kovac"},"dane barlow":{"id":"10584814","properName":"Dane Barlow"},"dayle pitcon":{"id":"10584819","properName":"Dayle Pitcon"},"ramanvir singh mann":{"id":"10650955","properName":"Ramanvir Singh Mann"},"corey bisognin":{"id":"10651671","properName":"Corey Bisognin"},"rohitendra nand":{"id":"10725838","properName":"Rohitendra Nand"},"manpreet singh 501769":{"id":"10788707","properName":"Manpreet Singh 501769"},"satnamsingh saini":{"id":"10797642","properName":"Satnamsingh Saini"},"paramjit singh":{"id":"10804706","properName":"Paramjit Singh"},"rafal pendecki":{"id":"10812525","properName":"Rafal Pendecki"},"raminder sandhu":{"id":"10871172","properName":"Raminder Sandhu"},"mandeep singh 501461":{"id":"10873599","properName":"Mandeep Singh 501461"},"abraham schultink":{"id":"10949824","properName":"Abraham Schultink"},"jake white":{"id":"11155574","properName":"Jake White"},"john marinas":{"id":"11653014","properName":"John Marinas"},"himanshu joshi":{"id":"11676881","properName":"Himanshu Joshi"},"kieth hansen":{"id":"11716936","properName":"Kieth Hansen"},"paul koolen":{"id":"11734401","properName":"Paul Koolen"},"rampreet sidhu":{"id":"11757228","properName":"Rampreet Sidhu"},"anthony george":{"id":"11762513","properName":"Anthony George"},"varinder pal":{"id":"11765605","properName":"Varinder Pal"},"harjot attri":{"id":"11766636","properName":"Harjot Attri"},"colin ginn":{"id":"11775324","properName":"Colin Ginn"},"simon stalman":{"id":"11793080","properName":"Simon Stalman"},"mohammed ahsad":{"id":"11807587","properName":"Mohammed Ahsad"},"andrew coad":{"id":"11898702","properName":"Andrew Coad"},"sukhwinder singh":{"id":"11928367","properName":"Sukhwinder Singh"},"dishant patel":{"id":"11946764","properName":"Dishant Patel"},"jaspreet singh 501844":{"id":"11950045","properName":"Jaspreet Singh 501844"},"jared biggs":{"id":"11958790","properName":"Jared Biggs"},"pawan kumar":{"id":"11964251","properName":"Pawan Kumar"},"clint armstrong":{"id":"11995578","properName":"Clint Armstrong"},"shivam gupta":{"id":"12017450","properName":"Shivam Gupta"},"harbhinder singh":{"id":"12052198","properName":"Harbhinder Singh"},"blake johns":{"id":"12084963","properName":"Blake Johns"},"harpreet singh":{"id":"12086064","properName":"Harpreet Singh"},"john bardsley":{"id":"12088561","properName":"John Bardsley"},"satnam singh":{"id":"12094156","properName":"Satnam Singh"},"imitiaz shah":{"id":"12120277","properName":"Imitiaz Shah"},"mark boys":{"id":"12156254","properName":"Mark Boys"},"michael van breda-foxwell":{"id":"12171647","properName":"Michael Van Breda-Foxwell"},"aseem pal utreja":{"id":"12286142","properName":"Aseem Pal Utreja"},"paul edwards":{"id":"12408043","properName":"Paul Edwards"},"jasmin hawksworth":{"id":"12614156","properName":"Jasmin Hawksworth"},"gagandeep singh aulakh":{"id":"12655316","properName":"Gagandeep Singh Aulakh"},"jarrod hicks":{"id":"12714773","properName":"Jarrod Hicks"},"harwinder marar":{"id":"12772672","properName":"Harwinder Marar"},"ruzzell bondoc":{"id":"12787893","properName":"Ruzzell Bondoc"},"jordan rihs":{"id":"12792496","properName":"Jordan Rihs"},"amandeep singh sarao 501901":{"id":"12819448","properName":"Amandeep Singh Sarao 501901"},"maninderjeet garcha":{"id":"12834045","properName":"Maninderjeet Garcha"},"allan munsie":{"id":"12851435","properName":"Allan Munsie"},"gurwinder singh":{"id":"12871850","properName":"Gurwinder Singh"},"marty watson":{"id":"12909716","properName":"Marty Watson"},"greg brownsey":{"id":"12912252","properName":"Greg Brownsey"},"michael van rijswijk":{"id":"12949570","properName":"Michael Van Rijswijk"},"ronald deane":{"id":"12955979","properName":"Ronald Deane"},"ali haider":{"id":"12983347","properName":"Ali Haider"},"harinderjit singh mann":{"id":"12990746","properName":"Harinderjit Singh Mann"},"sukhmandeep s sidhu":{"id":"13009829","properName":"Sukhmandeep S Sidhu"},"john o'sullivan":{"id":"13040038","properName":"John O'Sullivan"},"jamaluddin ibrahimi":{"id":"13052226","properName":"Jamaluddin Ibrahimi"},"nathan streeter":{"id":"13072626","properName":"Nathan Streeter"},"buenaventura jay velasco":{"id":"13092007","properName":"Buenaventura Jay Velasco"},"abubakar abdirahman":{"id":"13272033","properName":"Abubakar Abdirahman"},"sada deo":{"id":"13273774","properName":"Sada Deo"},"andrew kirkwood":{"id":"13300871","properName":"Andrew Kirkwood"},"amarprit singh":{"id":"13442799","properName":"Amarprit Singh"},"rupinder masson":{"id":"13479336","properName":"Rupinder Masson"},"john kurian":{"id":"13479618","properName":"John Kurian"},"randeep dhillon":{"id":"13487717","properName":"Randeep Dhillon"},"parvinder singh sandhu":{"id":"13519443","properName":"Parvinder Singh Sandhu"},"sourabh -":{"id":"13542180","properName":"Sourabh -"},"gregory collins":{"id":"13591334","properName":"Gregory Collins"},"gurpreet singh 801948":{"id":"13630502","properName":"Gurpreet Singh 801948"},"amrinder singh randhawa":{"id":"13631969","properName":"Amrinder Singh Randhawa"},"lisa pollard":{"id":"13644650","properName":"Lisa Pollard"}};
+
+const KNOWN_LOCATIONS = ["Austrak Point Wilson","Boral Concrete Clayton","Boral Concrete Cranbourne","Boral Concrete Healesville","Boral Concrete Waurn Ponds","Cemix Somerton","Cemix Whittelsea","Central Deer Park","Cmv Bookings Dandenong","Cmv Bookings Laverton","Eastern Freeway","Epping Premix","Flinstones Garden Supplies Donnybrook","Flinstones Garden Supplies Grovedale","Grovedale Concrete Plant","Heidelberg Materials Brooklyn","Heidelberg Materials Westall","Hercules","Hytec Dandenong","Hytec Kilsyth","Hytec Laverton","Hytec Mitcham","Hytec Somerton","Hytec South Wharf","Lantrak Pt Wilson","Melbourne Sand","Moolap Concrete Plant","Mulchxpress","Pronto Bacchus Marsh","Pronto Coburg","Pronto Dandenong","Pronto Donnybrook","Pronto Laverton","Pronto Mt Evelyn","Pronto Port Melbourne","Pronto Pt Melbourne","Pronto Pt Wilson","Pronto Ringwood","Pronto Springvale","Pronto Sunbury","Pronto Sunshine","Pronto Werribee","Riversdale Blvd","Scania","Truganina Workshop","Vic Civil","Visy Spotswood","Westerns","Youleys Garden Supplies"];
+const KNOWN_PRODUCTS = ["Melbourne Sand","South East Sands Concrete Sand","14mm Graded Boral Lysterfield","Boral Deer Park 14mm","Boral Deer Park 7mm","LTE 80-100mm Rubble","Veolia Dandenong","GPQ A4 filter sand","SES Coastal Beige Brick Sand","South East Sands Coastal Beige Sand","South East Sands Packing Sand","Tribuzi Quarry","Holcim Lang Lang Glass Sand","Visy Flint","Visy Green","Visy Amber","MVQ Point Wilson 14mm","Menheers Loam","MVQ Point Wilson 20mm","Local Mix Anakie 20mm CR","MVQ Little River Mansand","Devon Rd Premium Loam","MVQ Wyndhamvale 7mm - Bin 4","MVQ Wyndhamvale 14mm - Bin 5","MVQ Wyndhamvale 20mm - Bin 6","MVQ Wyndhamvale Dust - Bin 10","Boral Wollert Recycled Crushed Concrete - Bin 13","Devon Rd Sandy Loam - Bin 22","MVQ Little River 7mm You Yang Granite - Bin 42","MVQ Little River 7mm","Sand Supplies Glen Forbes","Boral Lysterfield 20mm - 100t","Boral Lysterfield 14mm","Boral Montrose 7mm","Boral Montrose Man Sand","Boral Lysterfield 20mm","Boral Coldstream 14mm","Boral Coldstream 7mm","Boral Wollert","Boral Montrose 14/10/7","Hanson Lysterfield 14mm","Castella 7mm","FH Tynong Dust","FH Tynong 14mm","Hanson Lysterfield 20mm","Metro Nyora Sand","Castella 14mm","Castella Dust","Central Rockbank 20mm","Central Rockbank 14mm","Central Rockbank Mansand","Hanson Wollert 20mm","Hanson Wollert 14mm","Wyndham Vale 20mm","Wyndham Vale 14mm","Maude 7mm","Little River 20mm","Little River Dust","Point Wilson 20mm","Point Wilson 14mm","Seymour 14mm","Seymour 20mm","Bacchus Marsh 9 Mile Sand","Maude 14mm","Maude Sand","Chelvon Maude Sand","W/Vale 14mm Blue","Melbourne Sands (Sand)","W/Vale 20mm Blue","Little River 14mm","Little River 7mm","W/Vale 7mm Blue","Melbourne Sand (Sand)"];
+
+function levenshtein(a, b) {
+  a = a.toLowerCase().trim();
+  b = b.toLowerCase().trim();
+  const m = a.length, n = b.length;
+  if (m === 0) return n;
+  if (n === 0) return m;
+  const dp = Array.from({length: m+1}, () => new Array(n+1).fill(0));
+  for (let i = 0; i <= m; i++) dp[i][0] = i;
+  for (let j = 0; j <= n; j++) dp[0][j] = j;
+  for (let i = 1; i <= m; i++) {
+    for (let j = 1; j <= n; j++) {
+      if (a[i-1] === b[j-1]) dp[i][j] = dp[i-1][j-1];
+      else dp[i][j] = 1 + Math.min(dp[i-1][j], dp[i][j-1], dp[i-1][j-1]);
+    }
+  }
+  return dp[m][n];
+}
+
+function similarityScore(a, b) {
+  const dist = levenshtein(a, b);
+  const maxLen = Math.max(a.length, b.length);
+  if (maxLen === 0) return 1;
+  return 1 - (dist / maxLen);
+}
+
+function matchAgainstList(readValue, list, threshold) {
+  if (!readValue || !readValue.trim()) return null;
+  const cleaned = readValue.toLowerCase().trim();
+  let bestMatch = null;
+  let bestScore = 0;
+  for (const item of list) {
+    const score = similarityScore(cleaned, item.toLowerCase());
+    if (score > bestScore) {
+      bestScore = score;
+      bestMatch = item;
+    }
+  }
+  return bestScore >= threshold ? bestMatch : null;
+}
+
+function matchDriverName(readName) {
+  if (!readName) return null;
+  if (NAME_LOOKUP[readName]) return NAME_LOOKUP[readName];
+  const readParts = readName.split(/\s+/).filter(Boolean);
+  let bestMatch = null;
+  let bestScore = 0;
+  for (const fullName in NAME_LOOKUP) {
+    const nameParts = fullName.split(/\s+/).filter(Boolean);
+    let score = 0;
+    readParts.forEach(rp => {
+      nameParts.forEach(np => {
+        if (rp === np) score += 2;
+        else if (np.startsWith(rp) || rp.startsWith(np)) score += 1;
+      });
+    });
+    if (score > bestScore) {
+      bestScore = score;
+      bestMatch = NAME_LOOKUP[fullName];
+    }
+  }
+  return bestScore >= 2 ? bestMatch : null;
+}
 const TRUCK_LOOKUP = {"305":"XW61HK","307":"XW63HK","312":"XW70HK","304":"XW41HX","326":"XW13IG","367":"XW52NB","379":"XW25NE"};
 
 let extracted = null;
@@ -225,13 +291,45 @@ async function runOCR(dataUrl) {
     cleaned = cleaned.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/```\s*$/i, '');
     extracted = JSON.parse(cleaned);
 
-    const driverIdVal = extracted.header.driverID.value;
-    const matchedName = DRIVER_LOOKUP[driverIdVal];
-    if (matchedName) extracted.header.driverName = { value: matchedName, confidence: 'high' };
+    const readName = (extracted.header.driverName.value || '').toLowerCase().trim();
+    const nameMatch = matchDriverName(readName);
+    if (nameMatch) {
+      extracted.header.driverName = { value: nameMatch.properName, confidence: 'high' };
+      extracted.header.driverID = { value: nameMatch.id, confidence: 'high', matched: true };
+    } else {
+      extracted.header.driverID = { value: '', confidence: 'medium', matched: false };
+    }
 
     const truckNoVal = extracted.header.truckNo.value;
     const matchedRego = TRUCK_LOOKUP[truckNoVal];
     if (matchedRego) extracted.header.rego = { value: matchedRego, confidence: 'high' };
+
+    const MATCH_THRESHOLD = 0.8;
+    extracted.loads.forEach(load => {
+      const rawPullFrom = load.pullFrom.value;
+      const pullFromMatch = matchAgainstList(rawPullFrom, KNOWN_LOCATIONS, MATCH_THRESHOLD);
+      if (pullFromMatch) {
+        load.pullFrom = { value: pullFromMatch, confidence: load.pullFrom.confidence, matched: true, rawText: rawPullFrom };
+      } else {
+        load.pullFrom = { value: 'Other', confidence: load.pullFrom.confidence, matched: false, rawText: rawPullFrom };
+      }
+
+      const rawDeliverTo = load.deliverTo.value;
+      const deliverToMatch = matchAgainstList(rawDeliverTo, KNOWN_LOCATIONS, MATCH_THRESHOLD);
+      if (deliverToMatch) {
+        load.deliverTo = { value: deliverToMatch, confidence: load.deliverTo.confidence, matched: true, rawText: rawDeliverTo };
+      } else {
+        load.deliverTo = { value: 'Other', confidence: load.deliverTo.confidence, matched: false, rawText: rawDeliverTo };
+      }
+
+      const rawProduct = load.product.value;
+      const productMatch = matchAgainstList(rawProduct, KNOWN_PRODUCTS, MATCH_THRESHOLD);
+      if (productMatch) {
+        load.product = { value: productMatch, confidence: load.product.confidence, matched: true, rawText: rawProduct };
+      } else {
+        load.product = { value: 'Other', confidence: load.product.confidence, matched: false, rawText: rawProduct };
+      }
+    });
 
     renderReview();
     showStage('reviewStage');
@@ -244,6 +342,10 @@ async function runOCR(dataUrl) {
 function buildPrompt() {
   return `You are reading a handwritten Cartage Australia driver run sheet. Extract the data into strict JSON only, no markdown fences, no preamble.
 
+DO NOT READ DRIVER ID. This sheet has a box printed top-right labelled "Driver ID" - ignore it completely, do not extract it, do not let it influence any other field. It is irrelevant to this task.
+
+CRITICAL - TRUCK NO FIELD: Truck No is in its own clearly labelled box, typically near the top of the sheet, separate from and NOT the same as the Driver ID box. Truck No is normally a 3-digit number (e.g. 326, 304, 367, 379). The Driver ID box is often printed in bold or colored ink and may look more visually prominent - do not let that prominence cause you to misread or substitute it into Truck No. Locate the box specifically labelled "Truck No" and read only the handwritten digits inside that exact box.
+
 CRITICAL ACCURACY RULES FOR NUMBERS:
 Long numbers (6+ digits, like odometer/kms readings) and alphanumeric codes (like docket numbers) are the most common source of misreads. For every numeric or alphanumeric field, follow this process before writing your final answer:
 1. Locate the exact handwritten characters in their field box.
@@ -252,14 +354,13 @@ Long numbers (6+ digits, like odometer/kms readings) and alphanumeric codes (lik
 4. Only then write the value. Never guess a "rounder" or "shorter" number than what is actually written - if you see 6 digits, write all 6, even if the number looks unusually large.
 
 FIELD-SPECIFIC EXPECTATIONS based on this exact run sheet template:
-- Kms Start and Kms Finish are odometer readings and are typically 5-7 digits long (e.g. 410111 or 410111.6). Do not truncate or drop digits. Read every digit individually.
-- Truck No is typically 3 digits (e.g. 326, 304, 367). Read each digit separately - do not let nearby numbers (like Driver ID, which is a different field elsewhere on the sheet) bleed into this reading.
+- Kms Start and Kms Finish are odometer readings and are typically 5-7 digits long (e.g. 410111.6 or 410181). Do not truncate or drop digits. Read every digit individually. Note these two numbers are usually close to each other (Kms Finish is slightly larger than Kms Start, since it is the same trip later) - if your reading of Finish is wildly different in digit count from Start, re-check it.
 - Docket Number (sometimes printed "Ticket No") is an alphanumeric code, often a mix of 1-3 letters followed by digits (e.g. NY120405, 24089128, 302931). Carefully distinguish letters from numbers - a handwritten "N" can look like an "M", a "0" can look like an "O", a "1" can look like an "I" or "7". Read the actual shape of each character, do not assume it must be all-digits.
 - Gross, Tare, and Net are weights in tonnes, normally 2 digits before the decimal and 2 after (e.g. 45.12, 16.56, 28.56). If only two of the three are filled in, the third is genuinely blank - do not calculate or guess it.
+- Start Time and Finish Time: this form sometimes uses AM/PM tick boxes or checkboxes printed right next to the typed time, instead of the driver writing "AM" or "PM" as text. Look carefully for a checkbox, circle, or tick mark next to "AM" and a separate one next to "PM" for EACH of Start Time and Finish Time independently - they are not linked, a driver can start AM and finish PM. Report whichever box has a mark in it. If genuinely no mark is visible on either box, leave confidence as "low" rather than guessing.
 
 OTHER READING NOTES:
 - These are handwritten, often messy, sometimes with crossed-out corrections. Trust the value in the actual printed field box; ignore stray marginal scribbles or numbers written outside the ruled boxes (e.g. corrections scrawled in the margin).
-- Some versions of this form use AM/PM tick boxes instead of written time text for Start Time and Finish Time - read the ticked box and report time as e.g. "8:00 AM".
 - Locations are often abbreviated (e.g. "D/Rd" = Devon Road, "Trug" = Truganina, "S/U" = Stick up, "P/up" = Pick up).
 
 CONFIDENCE RATING:
@@ -268,7 +369,6 @@ For every field, give a confidence rating: "high" only if you are genuinely cert
 Return exactly this JSON shape:
 {
   "header": {
-    "driverID": {"value": "", "confidence": ""},
     "driverName": {"value": "", "confidence": ""},
     "truckNo": {"value": "", "confidence": ""},
     "rego": {"value": "", "confidence": ""},
@@ -319,6 +419,34 @@ function fieldHTML(label, obj, path) {
   `;
 }
 
+function matchedFieldHTML(label, obj, path) {
+  if (obj.matched) {
+    const conf = obj.confidence || 'high';
+    const tagText = conf === 'low' ? 'CHECK THIS' : conf === 'medium' ? 'VERIFY' : 'READ OK';
+    return `
+      <div class="field">
+        <div class="field-top">
+          <label>${label}</label>
+          <span class="conf-tag ${conf}">MATCHED - ${tagText}</span>
+        </div>
+        <input type="text" value="${(obj.value||'').replace(/"/g,'&quot;')}" data-path="${path}" oninput="updateField(this)" class="conf-${conf}">
+      </div>
+    `;
+  }
+  const rawText = (obj.rawText || '').replace(/"/g,'&quot;');
+  return `
+    <div class="field">
+      <div class="field-top">
+        <label>${label}</label>
+        <span class="conf-tag medium">OTHER - NOT ON LIST</span>
+      </div>
+      <input type="text" value="Other" disabled style="background:#f1f5f9; color:#94a3b8;">
+      <div style="margin-top:6px; font-size:11px; color:#64748b;">AI read this as written on the sheet. Please correct or confirm below:</div>
+      <input type="text" value="${rawText}" data-path="${path}.rawText" oninput="updateField(this)" class="conf-medium" style="margin-top:4px;">
+    </div>
+  `;
+}
+
 function renderReview() {
   const lowCount = countLowConfidence();
   const banner = document.getElementById('statusBanner');
@@ -332,8 +460,13 @@ function renderReview() {
 
   let html = '<h3 class="section-title">Driver &amp; Truck Details</h3>';
   const h = extracted.header;
-  html += fieldHTML('Driver ID', h.driverID, 'header.driverID');
   html += fieldHTML('Driver Name', h.driverName, 'header.driverName');
+  if (h.driverID && h.driverID.matched) {
+    html += `<div class="status-banner ok" style="margin-bottom:14px;">Matched to Employee List - Driver ID ${h.driverID.value}</div>`;
+  } else {
+    html += `<div class="status-banner warn" style="margin-bottom:14px;">Could not match this name to the Employee List. Please check the name above, or enter Driver ID manually below.</div>`;
+  }
+  html += fieldHTML('Driver ID (optional - enter manually if needed)', h.driverID || {value:'',confidence:'high'}, 'header.driverID');
   html += fieldHTML('Truck No', h.truckNo, 'header.truckNo');
   html += fieldHTML('Rego', h.rego, 'header.rego');
   html += fieldHTML('Date', h.date, 'header.date');
@@ -347,9 +480,9 @@ function renderReview() {
   extracted.loads.forEach((load, idx) => {
     html += `<h3 class="section-title">Load ${idx+1}</h3>`;
     html += fieldHTML('Docket Number', load.docketNumber, `loads.${idx}.docketNumber`);
-    html += fieldHTML('Pickup Location', load.pullFrom, `loads.${idx}.pullFrom`);
-    html += fieldHTML('Deliver To', load.deliverTo, `loads.${idx}.deliverTo`);
-    html += fieldHTML('Product', load.product, `loads.${idx}.product`);
+    html += matchedFieldHTML('Pickup Location', load.pullFrom, `loads.${idx}.pullFrom`);
+    html += matchedFieldHTML('Deliver To', load.deliverTo, `loads.${idx}.deliverTo`);
+    html += matchedFieldHTML('Product', load.product, `loads.${idx}.product`);
     html += '<div class="row-3">';
     html += fieldHTML('Gross', load.gross, `loads.${idx}.gross`);
     html += fieldHTML('Tare', load.tare, `loads.${idx}.tare`);
@@ -366,9 +499,19 @@ function renderReview() {
 
 function updateField(input) {
   const path = input.dataset.path.split('.');
+  const lastKey = path[path.length-1];
+
+  if (lastKey === 'rawText') {
+    let obj = extracted;
+    for (let i = 0; i < path.length - 1; i++) obj = obj[path[i]];
+    obj.rawText = input.value;
+    document.getElementById('jsonOutput').textContent = JSON.stringify(extracted, null, 2);
+    return;
+  }
+
   let obj = extracted;
   for (let i = 0; i < path.length - 1; i++) obj = obj[path[i]];
-  obj[path[path.length-1]] = { value: input.value, confidence: 'high' };
+  obj[lastKey] = { value: input.value, confidence: 'high' };
   input.className = 'conf-high';
   const tag = input.closest('.field').querySelector('.conf-tag');
   tag.className = 'conf-tag high';
