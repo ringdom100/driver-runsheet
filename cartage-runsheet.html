@@ -707,15 +707,29 @@
           <div class="field-error" id="err-finishTime">Required</div>
         </div>
       </div>
-      <div class="field">
-        <label>Odometer Reading <span class="req">*</span></label>
-        <input type="number" id="odometer" placeholder="e.g. 1600" inputmode="numeric"
-               oninput="validateField(this); updateProgress()">
-        <div class="field-error" id="err-odometer">Required</div>
+      <div class="row-2">
+        <div class="field">
+          <label>Kms Start <span class="req">*</span></label>
+          <input type="number" id="odometerStart" placeholder="e.g. 327670" inputmode="numeric"
+                 oninput="validateField(this); calcTotalKms(); updateProgress()">
+          <div class="field-error" id="err-odometerStart">Required</div>
+        </div>
+        <div class="field">
+          <label>Kms Finish <span class="req">*</span></label>
+          <input type="number" id="odometerFinish" placeholder="e.g. 328038" inputmode="numeric"
+                 oninput="validateField(this); calcTotalKms(); updateProgress()">
+          <div class="field-error" id="err-odometerFinish">Required</div>
+        </div>
       </div>
-      <div class="field">
-        <label>Total Hours <span class="auto-tag">✓ Auto</span></label>
-        <input type="text" id="totalHours" readonly placeholder="Calculated automatically">
+      <div class="row-2">
+        <div class="field">
+          <label>Total Kms <span class="auto-tag">✓ Auto</span></label>
+          <input type="text" id="totalKms" readonly placeholder="Calculated automatically">
+        </div>
+        <div class="field">
+          <label>Total Hours <span class="auto-tag">✓ Auto</span></label>
+          <input type="text" id="totalHours" readonly placeholder="Calculated automatically">
+        </div>
       </div>
     </div>
   </div>
@@ -1020,7 +1034,7 @@ function addLoad() {
     </div>
     <div class="load-body">
       <div class="field">
-        <label>Ticket No. <span class="req">*</span></label>
+        <label>Docket Number <span class="req">*</span></label>
         <input type="text" id="ticketNo${idx}" placeholder="e.g. 24089128"
                oninput="validateField(this); updateProgress()" autocomplete="off">
         <div class="field-error" id="err-ticketNo${idx}">Required</div>
@@ -1137,14 +1151,23 @@ function addLoad() {
           </div>
         </div>
       </div>
-      <div class="row-2">
+      <div class="row-3">
         <div class="field">
-          <label>Tonnes <span class="req">*</span></label>
-          <input type="number" id="tonnes${idx}" placeholder="0.00" min="0.1" step="0.01"
-                 oninput="validateField(this); calcTotals(); updateProgress()" inputmode="decimal">
-          <div class="field-error" id="err-tonnes${idx}">Required</div>
+          <label>Gross (t) <span class="req">*</span></label>
+          <input type="number" id="gross${idx}" placeholder="0.00" min="0" step="0.01"
+                 oninput="calcNet(${idx}); validateField(this); updateProgress()" inputmode="decimal">
+          <div class="field-error" id="err-gross${idx}">Required</div>
         </div>
-        <div></div>
+        <div class="field">
+          <label>Tare (t) <span class="req">*</span></label>
+          <input type="number" id="tare${idx}" placeholder="0.00" min="0" step="0.01"
+                 oninput="calcNet(${idx}); validateField(this); updateProgress()" inputmode="decimal">
+          <div class="field-error" id="err-tare${idx}">Required</div>
+        </div>
+        <div class="field">
+          <label>Net (t) <span class="auto-tag">✓ Auto</span></label>
+          <input type="text" id="tonnes${idx}" readonly placeholder="0.00">
+        </div>
       </div>
       <div class="row-2">
         <div class="field">
@@ -1161,6 +1184,11 @@ function addLoad() {
           </div>
           <input type="hidden" id="depart${idx}">
         </div>
+      </div>
+      <div class="field">
+        <label>Comments <span style="color:var(--muted);font-weight:400;text-transform:none;">(optional — e.g. delay, diversion, stick up)</span></label>
+        <textarea id="comments${idx}" placeholder="e.g. Diverted to Springvale, stick up at site…"
+                  oninput="updateProgress()" rows="2"></textarea>
       </div>
       ${idx > 1 ? `<button onclick="removeLoad(${idx})" style="margin-top:8px;background:transparent;border:1px solid #fecaca;color:#dc2626;font-size:12px;font-weight:600;padding:6px 14px;border-radius:6px;cursor:pointer;">Remove Load ${idx}</button>` : ''}
     </div>
@@ -1182,6 +1210,22 @@ function updateAddLoadBtn() {
   const btn = document.getElementById('addLoadBtn');
   if (loadCount >= MAX_LOADS) btn.style.display = 'none';
   else btn.style.display = 'flex';
+}
+
+function calcNet(idx) {
+  const grossEl = document.getElementById(`gross${idx}`);
+  const tareEl = document.getElementById(`tare${idx}`);
+  const netEl = document.getElementById(`tonnes${idx}`);
+  const gross = parseFloat(grossEl.value);
+  const tare = parseFloat(tareEl.value);
+  if (isNaN(gross) || isNaN(tare)) { netEl.value = ''; calcTotals(); return; }
+  const net = gross - tare;
+  if (net < 0) {
+    netEl.value = 'Check weights';
+  } else {
+    netEl.value = net.toFixed(2);
+  }
+  calcTotals();
 }
 
 function calcTotals() {
@@ -1209,6 +1253,19 @@ function calcTotalHours() {
   const h = Math.floor(mins/60);
   const m = mins % 60;
   document.getElementById('totalHours').value = `${h}h ${m}m`;
+}
+
+function calcTotalKms() {
+  const s = parseFloat(document.getElementById('odometerStart').value);
+  const f = parseFloat(document.getElementById('odometerFinish').value);
+  const totalEl = document.getElementById('totalKms');
+  if (isNaN(s) || isNaN(f)) { totalEl.value = ''; return; }
+  const diff = f - s;
+  if (diff < 0) {
+    totalEl.value = 'Check readings';
+  } else {
+    totalEl.value = `${diff} km`;
+  }
 }
 
 // ── SIGNATURE ─────────────────────────────────────────────
@@ -1537,7 +1594,7 @@ function validateField(el) {
 
 // ── PROGRESS ──────────────────────────────────────────────
 function updateProgress() {
-  const baseFields = ['driverID','truckNo','truckRego','depot','startTime','finishTime','odometer'];
+  const baseFields = ['driverID','truckNo','truckRego','depot','startTime','finishTime','odometerStart','odometerFinish'];
   let filled = 0, total = baseFields.length + 4;
   baseFields.forEach(id => { const el=document.getElementById(id); if(el&&el.value.trim()!=='') filled++; });
   if (photoData.runSheet) filled++;
@@ -1546,9 +1603,10 @@ function updateProgress() {
   const t1 = document.getElementById('ticketNo1');
   const p1 = document.getElementById('pullFrom1');
   const d1 = document.getElementById('deliverTo1');
-  const tn1 = document.getElementById('tonnes1');
+  const g1 = document.getElementById('gross1');
+  const tr1 = document.getElementById('tare1');
   if (t1&&t1.value.trim()) filled++;
-  if (tn1&&tn1.value.trim()) filled++;
+  if (g1&&g1.value.trim()&&tr1&&tr1.value.trim()) filled++;
   if (hasSig) filled++;
   const pct = Math.round((filled/total)*100);
   document.getElementById('progressFill').style.width = Math.min(pct,100)+'%';
@@ -1571,7 +1629,8 @@ function submitForm() {
     {id:'depot',label:'Depot'},
     {id:'startTime',label:'Start Time'},
     {id:'finishTime',label:'Finish Time'},
-    {id:'odometer',label:'Odometer Reading'},
+    {id:'odometerStart',label:'Kms Start'},
+    {id:'odometerFinish',label:'Kms Finish'},
   ];
   required.forEach(f => {
     const el = document.getElementById(f.id);
@@ -1584,10 +1643,11 @@ function submitForm() {
     }
   });
   // Validate load 1
-  ['ticketNo1','pullFrom1','deliverTo1','tonnes1'].forEach((id,i) => {
+  ['ticketNo1','pullFrom1','deliverTo1','gross1','tare1'].forEach((id,i) => {
     const el = document.getElementById(id);
-    if (!el||!el.value.trim()) { el&&el.classList.add('error'); document.getElementById(`err-${id}`)?.classList.add('show'); errors.push(['Ticket No (Load 1)','Pull From (Load 1)','Deliver To (Load 1)','Tonnes (Load 1)'][i]); }
+    if (!el||!el.value.trim()) { el&&el.classList.add('error'); document.getElementById(`err-${id}`)?.classList.add('show'); errors.push(['Docket Number (Load 1)','Pull From (Load 1)','Deliver To (Load 1)','Gross (Load 1)','Tare (Load 1)'][i]); }
   });
+  if (document.getElementById('tonnes1')?.value === 'Check weights') errors.push('Load 1: Gross weight must be greater than Tare weight');
   if (!photoData.runSheet) errors.push('Run Sheet photo');
   if (!photoData.dockets.some(d=>d!==null)) errors.push('At least 1 Weighbridge Docket photo');
   if (!hasSig) errors.push('Driver Signature');
@@ -1610,13 +1670,16 @@ function submitForm() {
     if (el&&el.closest('.load-card')) {
       loads.push({
         load: i,
-        ticketNo: document.getElementById(`ticketNo${i}`)?.value||'',
+        docketNumber: document.getElementById(`ticketNo${i}`)?.value||'',
         pullFrom: document.getElementById(`pullFrom${i}`)?.value||'',
         deliverTo: document.getElementById(`deliverTo${i}`)?.value||'',
         product: document.getElementById(`product${i}`)?.value||'',
-        tonnes: document.getElementById(`tonnes${i}`)?.value||'',
+        gross: document.getElementById(`gross${i}`)?.value||'',
+        tare: document.getElementById(`tare${i}`)?.value||'',
+        netTonnes: document.getElementById(`tonnes${i}`)?.value||'',
         arrive: document.getElementById(`arrive${i}`)?.value||'',
         depart: document.getElementById(`depart${i}`)?.value||'',
+        comments: document.getElementById(`comments${i}`)?.value||'',
       });
     }
   }
@@ -1631,7 +1694,9 @@ function submitForm() {
     startTime: document.getElementById('startTime').value,
     finishTime: document.getElementById('finishTime').value,
     totalHours: document.getElementById('totalHours').value,
-    odometer: document.getElementById('odometer').value,
+    odometerStart: document.getElementById('odometerStart').value,
+    odometerFinish: document.getElementById('odometerFinish').value,
+    totalKms: document.getElementById('totalKms').value,
     fuel: document.getElementById('fuel').value,
     loads: loads,
     totalLoads: loads.length,
@@ -1681,7 +1746,7 @@ function resetForm() {
   document.getElementById('loadsContainer').innerHTML = '';
   loadCount = 0;
   addLoad();
-  ['driverID','driverName','truckNo','truckRego','depot','startTime','finishTime','totalHours','odometer','fuel','notes',
+  ['driverID','driverName','truckNo','truckRego','depot','startTime','finishTime','totalHours','odometerStart','odometerFinish','totalKms','fuel','notes',
    'break1Start','break1Dur','break2Start','break2Dur','break3Start','break3Dur','break4Start','break4Dur'].forEach(id => {
     const el=document.getElementById(id); if(el){el.value='';el.classList.remove('error','valid');}
   });
