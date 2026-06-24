@@ -1039,27 +1039,34 @@ function applyScanResults(ex) {
   const h = ex.header || {};
   let fieldsApplied = 0;
 
-  // Rego: read from sheet, auto-fill rego field and reverse-lookup truck number
+  // Rego: only auto-fill if it exactly matches a truck in the fleet list
   if (h.rego && h.rego.value && h.rego.confidence !== 'low') {
     const scannedRego = h.rego.value.toUpperCase().trim();
-    const regoEl = document.getElementById('truckRego');
-    if (regoEl && !regoEl.value.trim()) {
-      regoEl.value = scannedRego;
-      regoEl.classList.add('valid');
-      fieldsApplied++;
-      // Reverse lookup: find truck number from rego
-      const truckNoEl = document.getElementById('truckNo');
-      if (truckNoEl && !truckNoEl.value.trim()) {
-        for (const [truckNo, rego] of Object.entries(TRUCK_LOOKUP)) {
-          if (rego.toUpperCase() === scannedRego) {
-            truckNoEl.value = truckNo;
-            truckNoEl.classList.add('valid');
-            document.getElementById('regoAutoTag').style.display = 'inline-flex';
-            break;
-          }
-        }
+    // Reverse lookup: find truck number from rego
+    let matchedTruckNo = null;
+    for (const [truckNo, rego] of Object.entries(TRUCK_LOOKUP)) {
+      if (rego.toUpperCase() === scannedRego) {
+        matchedTruckNo = truckNo;
+        break;
       }
     }
+    if (matchedTruckNo) {
+      const regoEl = document.getElementById('truckRego');
+      const truckNoEl = document.getElementById('truckNo');
+      if (regoEl && !regoEl.value.trim()) {
+        regoEl.value = scannedRego;
+        regoEl.classList.add('valid');
+        fieldsApplied++;
+      }
+      if (truckNoEl && !truckNoEl.value.trim()) {
+        truckNoEl.value = matchedTruckNo;
+        truckNoEl.classList.add('valid');
+        document.getElementById('regoAutoTag').style.display = 'inline-flex';
+        document.getElementById('truckNoWarning').style.display = 'none';
+        fieldsApplied++;
+      }
+    }
+    // If no match found, leave both fields blank — do not populate unvalidated data
   }
 
   if (h.startTime && h.startTime.value) { setTimeFromScan('startTime', h.startTime.value); fieldsApplied++; }
@@ -1082,7 +1089,24 @@ function applyScanResults(ex) {
 
     if (load.docketNumber && load.docketNumber.value) {
       const el = document.getElementById('ticketNo' + idx);
-      if (el) { el.value = load.docketNumber.value; fieldsApplied++; }
+      if (el) {
+        el.value = load.docketNumber.value;
+        if (load.docketNumber.confidence !== 'high') {
+          el.classList.add('error');
+          el.classList.remove('valid');
+          el.setAttribute('data-needs-confirm', 'true');
+          const errEl = document.getElementById('err-ticketNo' + idx);
+          if (errEl) {
+            errEl.textContent = 'AI read this docket number — please verify it is correct before submitting';
+            errEl.classList.add('show');
+            errEl.style.color = '#dc2626';
+          }
+        } else {
+          el.classList.add('valid');
+          el.setAttribute('data-needs-confirm', 'false');
+        }
+        fieldsApplied++;
+      }
     }
 
     const rawPullFrom = (load.pullFrom && load.pullFrom.value) || '';
@@ -1399,7 +1423,7 @@ function addLoad() {
       <div class="field">
         <label>Docket Number <span class="req">*</span></label>
         <input type="text" id="ticketNo${idx}" placeholder="e.g. 24089128"
-               oninput="validateField(this); updateProgress()" autocomplete="off">
+               oninput="this.removeAttribute('data-needs-confirm'); this.classList.remove('error'); document.getElementById('err-ticketNo${idx}').classList.remove('show'); validateField(this); updateProgress()" autocomplete="off">
         <div class="field-error" id="err-ticketNo${idx}">Required</div>
       </div>
       <div class="field">
@@ -2077,6 +2101,13 @@ function submitForm() {
     const el = document.getElementById(id);
     if (!el||!el.value.trim()) { el&&el.classList.add('error'); document.getElementById(`err-${id}`)?.classList.add('show'); errors.push(['Docket Number (Load 1)','Gross (Load 1)','Tare (Load 1)'][i]); }
   });
+  // Check all docket numbers that were AI-scanned but not yet confirmed by driver
+  for (let i = 1; i <= MAX_LOADS; i++) {
+    const el = document.getElementById('ticketNo' + i);
+    if (el && el.getAttribute('data-needs-confirm') === 'true') {
+      errors.push(`Docket Number (Load ${i}) was read by AI — please verify and tap the field to confirm it is correct`);
+    }
+  }
   if (!resolveLocationValue(1,'pullFrom').trim()) {
     document.getElementById('pullFrom1')?.classList.add('error');
     document.getElementById('err-pullFrom1')?.classList.add('show');
