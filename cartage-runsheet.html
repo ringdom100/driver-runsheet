@@ -1096,7 +1096,15 @@ function applyScanResults(ex) {
   }
 
   if (h.startTime && h.startTime.value) { setTimeFromScan('startTime', h.startTime.value); fieldsApplied++; }
-  if (h.finishTime && h.finishTime.value) { setTimeFromScan('finishTime', h.finishTime.value); fieldsApplied++; }
+  if (h.finishTime && h.finishTime.value) {
+    // Only set finish time if it actually differs from start time
+    // and if start time was also provided (prevents orphaned finish times)
+    const startVal = h.startTime && h.startTime.value ? h.startTime.value : '';
+    if (h.finishTime.value !== startVal) {
+      setTimeFromScan('finishTime', h.finishTime.value);
+      fieldsApplied++;
+    }
+  }
 
   if (h.kmsStart && h.kmsStart.value) {
     const el = document.getElementById('odometerStart');
@@ -1216,20 +1224,20 @@ READ THESE FIELDS:
 
 HEADER:
 - Rego: Find the field labelled "Rego:" on the sheet. Read the handwritten value in the box immediately to the right of that label. This is a vehicle registration number, typically 6 characters mixing letters and numbers (e.g. XW13IG, XW52NB). Read it carefully character by character.
-- Start Time: the time the shift started. Check AM/PM tick boxes independently.
-- Finish Time: the time the shift finished. Check AM/PM tick boxes independently. NOTE - Start Time will always be earlier in the day than Finish Time. If you are unsure which is which, the earlier time is always Start Time.
-- Kms Start: the LOWER odometer number - this is always the smaller of the two kms readings since the truck has driven less distance at the start of the shift. Typically 5-7 digits.
-- Kms Finish: the HIGHER odometer number - this is always the larger of the two kms readings since more distance has been covered by end of shift. Must be greater than Kms Start. If your reading gives Finish less than Start, you have them swapped - re-read and swap them.
+- Start Time: the time the shift started. Check AM/PM tick boxes independently. If the field is blank or illegible, return empty string - do NOT guess.
+- Finish Time: the time the shift finished. Check AM/PM tick boxes independently. CRITICAL: If the Finish Time field is blank on the sheet, return empty string. Do NOT infer, estimate, or guess a finish time. Do NOT use the start time or any other time to calculate a finish time. Blank means blank.
+- Kms Start: the LOWER odometer number - always smaller since the truck has driven less at shift start. Typically 5-7 digits. If blank, return empty string.
+- Kms Finish: the HIGHER odometer number - always larger since more distance covered by end of shift. Must be greater than Kms Start. If your reading gives Finish less than Start, you have them swapped - re-read and swap them. If blank, return empty string.
 
 LOADS: For each row with handwritten data read:
-- Docket Number (also labelled "Ticket No")
+- Docket Number: this column may be labelled either "Docket Number" OR "Ticket No" OR "Ticket No:" depending on which version of the run sheet is being used - both refer to the same field. Read the handwritten value in that column only. If the cell is blank or you cannot read it clearly, return empty string - do NOT guess or infer from nearby columns.
 - Pickup Location ("P/up From")
 - Deliver To
 - Product
 - Gross weight
 - Tare weight
 - Net weight
-- Comments: ONLY read from the column specifically labelled "Comments" or "Reason for Delay" on the paper sheet. Do not read from any other column. If that column is blank for this row, return empty string.
+- Comments: ONLY read from the column specifically labelled "Comments" or "Reason for Delay". If blank, return empty string.
 
 Skip blank load rows entirely. Do not read axle weight columns (Steer, Drive, P/Mover, Front Axle, Rear Tri).
 
