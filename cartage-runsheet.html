@@ -1627,6 +1627,11 @@ function checkForScheduledJobs() {
     driverName ? findTruckByDriverName(driverName) : null;
   showDebug('matchedTruck: ' + matchedTruck);
   showDebug('scheduleData keys: ' + Object.keys(scheduleData).slice(0,10).join(','));
+  if (matchedTruck) {
+    const td = scheduleData[matchedTruck];
+    showDebug('truckData keys: ' + Object.keys(td || {}).join(','));
+    showDebug('loads: ' + JSON.stringify(td?.loads?.slice(0,1)));
+  }
 
   if (matchedTruck && scheduleData[matchedTruck]?.loads?.length > 0) {
     showDebug('SHOWING BANNER for truck ' + matchedTruck + ' loads:' + scheduleData[matchedTruck].loads.length);
