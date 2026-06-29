@@ -1528,7 +1528,8 @@ function parseScheduleRows(rows) {
 }
 
 function splitJobString(job) {
-  // Split on unicode arrow or ASCII arrow
+  // Normalise arrow - handle no space before arrow e.g. "Sand-> Ipswich"
+  job = job.replace(/\s*\u2192\s*/g, ' \u2192 ').replace(/\s*->\s*/g, ' -> ');
   if (job.includes('\u2192')) {
     const parts = job.split('\u2192');
     return {pickup: parts[0].trim(), deliverTo: parts[1].trim()};
@@ -1552,6 +1553,8 @@ function splitQuarryMaterial(rVal) {
     [/^(Fraser Coast)\s+(.+)$/i, 'Fraser Coast'],
     [/^(Ipswich)\s+(.+)$/i, 'Ipswich'],
     [/^(Holcim\s+\w+)$/i, null],
+    // Coastal Sands with optional material e.g. "Coastal  Fine Sand" -> quarry: Coastal Sands, product: Fine Sand
+    [/^(Coastal)\s+(.+)$/i, 'Coastal Sands'],
     [/^(Coastal Sands)$/i, null],
     [/^(Lantrak)$/i, null],
   ];
@@ -1563,7 +1566,6 @@ function splitQuarryMaterial(rVal) {
       return {pickup: pickup.trim(), product};
     }
   }
-  // Default: whole string is pickup, no product
   return {pickup: rVal, product: ''};
 }
 
@@ -1667,17 +1669,6 @@ function loadJobsFromSchedule() {
 
   const truckData = scheduleData[matchedTruck];
   const jobs = truckData.loads || [];
-
-  // Set date from sheet date (e.g. "25.06.26" -> "2026-06-25")
-  if (scheduleSheetDate) {
-    const parts = scheduleSheetDate.split('.');
-    if (parts.length === 3) {
-      const yyyy = '20' + parts[2];
-      const formattedDate = `${yyyy}-${parts[1]}-${parts[0]}`;
-      const dateEl = document.getElementById('jobDate');
-      if (dateEl) dateEl.value = formattedDate;
-    }
-  }
 
   // Auto-fill depot if not already set
   if (truckData.depot) {
