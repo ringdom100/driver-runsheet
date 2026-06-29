@@ -1391,6 +1391,17 @@ function processScheduleFile(input) {
       for (const sName of sheetsToLoad) {
         const ws = workbook.Sheets[sName];
         const rows = XLSX.utils.sheet_to_json(ws, {header: 1, defval: ''});
+
+        // DEBUG: show first 20 rows of first sheet
+        if (sName === sheetsToLoad[0]) {
+          let dbg = 'Sheet: ' + sName + '\n';
+          for (let r = 0; r < 20; r++) {
+            const row = rows[r] || [];
+            dbg += 'R' + r + ': [' + row.slice(0,14).map(v => JSON.stringify(String(v).slice(0,15))).join(',') + ']\n';
+          }
+          alert(dbg);
+        }
+
         const parsed = parseScheduleRows(rows);
         const dateMatch = sName.match(/(\d{2}\.\d{2}\.\d{2})/);
         const dateStr = dateMatch ? dateMatch[1] : '';
@@ -1461,17 +1472,18 @@ function parseScheduleRows(rows) {
     const row = rows[i] || [];
 
     // Detect Description rows (marks start of a driver block set)
-    const isDescRow = BLOCK_COLS.some(bc => String(row[bc] || '').trim() === 'Description');
+    const isDescRow = BLOCK_COLS.some(bc => String(row[bc] || '').trim().replace(/^[\u2018\u2019\u201C\u201D'"]+|[\u2018\u2019\u201C\u201D'"]+$/g, '') === 'Description');
     if (!isDescRow) { i++; continue; }
 
     // Row above has driver names
     const nameRow = i > 0 ? (rows[i-1] || []) : [];
 
     for (const bc of BLOCK_COLS) {
-      if (String(row[bc] || '').trim() !== 'Description') continue;
+      if (String(row[bc] || '').trim().replace(/^[\u2018\u2019\u201C\u201D'"]+|[\u2018\u2019\u201C\u201D'"]+$/g, '') !== 'Description') continue;
 
       // Parse truck cell: "419 Bromelton" or "8068 Mt Cotton"
-      const truckCell = String(row[bc+1] || '').trim();
+      // Strip smart/curly quotes that Excel sometimes adds
+      const truckCell = String(row[bc+1] || '').trim().replace(/^[\u2018\u2019\u201C\u201D'"]+|[\u2018\u2019\u201C\u201D'"]+$/g, '');
       const truckMatch = truckCell.match(/^(\d{3,4})\s+(.+)$/);
       if (!truckMatch) continue;
 
@@ -1488,8 +1500,8 @@ function parseScheduleRows(rows) {
       let j = i + 1;
       while (j < MAX_ROW) {
         const loadRow = rows[j] || [];
-        const descCol = String(loadRow[bc] || '').trim();
-        const jobCol = String(loadRow[bc+1] || '').trim();
+        const descCol = String(loadRow[bc] || '').trim().replace(/^[\u2018\u2019\u201C\u201D'"]+|[\u2018\u2019\u201C\u201D'"]+$/g, '');
+        const jobCol = String(loadRow[bc+1] || '').trim().replace(/^[\u2018\u2019\u201C\u201D'"]+|[\u2018\u2019\u201C\u201D'"]+$/g, '');
 
         if (descCol === 'Description') break;
         if (descCol.includes('Total Rate')) break;
