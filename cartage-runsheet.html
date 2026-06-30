@@ -667,7 +667,7 @@
           <label>Date <span class="auto-tag">Auto</span></label>
           <input type="date" id="jobDate" readonly
             onclick="this.removeAttribute('readonly'); this.showPicker && this.showPicker();"
-            onchange="this.setAttribute('readonly',''); resetLoadsForNewDriver();"
+            onchange="this.setAttribute('readonly',''); applyScheduleForSelectedDate(); resetLoadsForNewDriver();"
             style="border-color: var(--orange); background: #fffbeb; font-weight:600;">
         </div>
       </div>
@@ -690,7 +690,7 @@
         <div class="field">
           <label>Truck No. <span class="req">*</span></label>
           <input type="text" id="truckNo" placeholder="e.g. 305"
-                 oninput="lookupTruck(); resetLoadsForNewDriver(); validateField(this); updateProgress()" autocomplete="off" inputmode="numeric">
+                 oninput="lookupTruck(); resetDriverForNewTruck(); resetLoadsForNewDriver(); validateField(this); updateProgress()" autocomplete="off" inputmode="numeric">
           <div class="field-error" id="err-truckNo">Required</div>
         </div>
         <div class="field">
@@ -1344,7 +1344,7 @@ function processScheduleFile(input) {
       // Get today and last 4 days as date strings DD.MM.YY
       const today = new Date();
       const recentDates = [];
-      for (let i = 0; i < 5; i++) {
+      for (let i = 0; i < 10; i++) {
         const d = new Date(today);
         d.setDate(today.getDate() - i);
         const dd = String(d.getDate()).padStart(2,'0');
@@ -1426,7 +1426,7 @@ function processScheduleFile(input) {
         const saveRes = await fetch(CLOUDFLARE_WORKER, {
           method: 'POST',
           headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify(todayPayload)
+          body: JSON.stringify(fullPayload)
         });
         const saveJson = await saveRes.json();
         document.getElementById('dispatchProgress').style.display = 'none';
@@ -1603,6 +1603,17 @@ function parseTimeToMinutes(timeStr) {
 }
 
 
+function resetDriverForNewTruck() {
+  driverLookupInProgress = true;
+  document.getElementById('driverName').value = '';
+  document.getElementById('driverID').value = '';
+  driverLookupInProgress = false;
+  verifiedDriverName = null;
+  document.getElementById('driverIdOk').style.display = 'none';
+  document.getElementById('driverIdWarning').style.display = 'none';
+  document.getElementById('driverNameNoMatch').style.display = 'none';
+}
+
 function resetLoadsForNewDriver() {
   // Clear all load cards and re-show banner if schedule available
   document.getElementById('loadsContainer').innerHTML = '';
@@ -1621,7 +1632,11 @@ function fetchScheduleFromJsonbin() {
       return r.json();
     })
     .then(res => {
-      if (res && res.data && Object.keys(res.data).length > 0) {
+      if (res && res.allDays) {
+        window.allDaysSchedule = res.allDays;
+        localStorage.setItem('cartage_schedule', JSON.stringify(res));
+        applyScheduleForSelectedDate();
+      } else if (res && res.data && Object.keys(res.data).length > 0) {
         scheduleData = res.data;
         scheduleSheetDate = res.sheetDate || '';
         localStorage.setItem('cartage_schedule', JSON.stringify(res));
@@ -1629,8 +1644,44 @@ function fetchScheduleFromJsonbin() {
       }
     })
     .catch(() => {
-      // No schedule available - that's fine, drivers enter manually
+      const stored = localStorage.getItem('cartage_schedule');
+      if (stored) applyStoredSchedule(stored);
     });
+}
+
+function applyScheduleForSelectedDate() {
+  // Use the date the driver has selected, or today
+  const dateEl = document.getElementById('jobDate');
+  const selectedDate = dateEl ? dateEl.value : '';
+  let dateStr = '';
+  if (selectedDate) {
+    const parts = selectedDate.split('-');
+    if (parts.length === 3) {
+      dateStr = parts[2].slice(-2) + '.' + parts[1] + '.' + parts[0].slice(2);
+    }
+  }
+  if (!dateStr) {
+    const today = new Date();
+    dateStr = String(today.getDate()).padStart(2,'0') + '.' + String(today.getMonth()+1).padStart(2,'0') + '.' + String(today.getFullYear()).slice(2);
+  }
+
+  const allDays = window.allDaysSchedule || {};
+  if (allDays[dateStr] && Object.keys(allDays[dateStr]).length > 0) {
+    scheduleData = allDays[dateStr];
+    scheduleSheetDate = dateStr;
+  } else {
+    // Fall back to most recent date with loads
+    const sortedDates = Object.keys(allDays).sort().reverse();
+    for (const d of sortedDates) {
+      const count = Object.values(allDays[d]).reduce((s,v) => s + (v.loads ? v.loads.length : 0), 0);
+      if (count > 0) {
+        scheduleData = allDays[d];
+        scheduleSheetDate = d;
+        break;
+      }
+    }
+  }
+  checkForScheduledJobs();
 }
 
 function checkForScheduledJobs() {
@@ -1660,11 +1711,14 @@ function checkForScheduledJobs() {
 function applyStoredSchedule(json) {
   try {
     const parsed = JSON.parse(json);
-    // Parse schedule data
-    scheduleData = parsed.data;
-    scheduleSheetDate = parsed.sheetDate || '';
-    if (parsed.allDays) window.allDaysSchedule = parsed.allDays;
-    checkForScheduledJobs();
+    if (parsed.allDays) {
+      window.allDaysSchedule = parsed.allDays;
+      applyScheduleForSelectedDate();
+    } else {
+      scheduleData = parsed.data;
+      scheduleSheetDate = parsed.sheetDate || '';
+      checkForScheduledJobs();
+    }
   } catch(e) { }
 }
 
