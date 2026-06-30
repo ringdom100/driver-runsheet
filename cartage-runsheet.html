@@ -1735,6 +1735,16 @@ function findTruckByDriverName(name) {
   return null;
 }
 
+function setSelectSafely(selectEl, value) {
+  // Only assign if the value actually exists as an option - prevents silent blank selects
+  const exists = Array.from(selectEl.options).some(o => o.value === value || o.textContent === value);
+  if (exists) {
+    selectEl.value = value;
+    return true;
+  }
+  return false;
+}
+
 function loadJobsFromSchedule() {
   const truckNo = document.getElementById('truckNo')?.value?.trim();
   const driverName = document.getElementById('driverName')?.value?.trim();
@@ -1793,8 +1803,7 @@ function loadJobsFromSchedule() {
     if (pfSel) {
       if (job.pickup) {
         const match = matchList(job.pickup, KNOWN_LOCATIONS, 0.7);
-        if (match) {
-          pfSel.value = match;
+        if (match && setSelectSafely(pfSel, match)) {
           if (pfOtherWrap) pfOtherWrap.style.display = 'none';
         } else {
           pfSel.value = 'Other';
@@ -1816,8 +1825,7 @@ function loadJobsFromSchedule() {
     if (dtSel) {
       if (job.deliverTo) {
         const match = matchList(job.deliverTo, KNOWN_LOCATIONS, 0.7);
-        if (match) {
-          dtSel.value = match;
+        if (match && setSelectSafely(dtSel, match)) {
           if (dtOtherWrap) dtOtherWrap.style.display = 'none';
         } else {
           dtSel.value = 'Other';
@@ -1838,8 +1846,7 @@ function loadJobsFromSchedule() {
     if (prodSel) {
       if (job.product) {
         const match = matchList(job.product, KNOWN_PRODUCTS, 0.7);
-        if (match) {
-          prodSel.value = match;
+        if (match && setSelectSafely(prodSel, match)) {
           if (prodOtherWrap) prodOtherWrap.style.display = 'none';
         } else {
           prodSel.value = 'Other';
@@ -2314,6 +2321,7 @@ function addLoad() {
           <option>Hervey Bay Readymix</option>
           <option>Holcim</option>
           <option>Holcim Southport</option>
+          <option>Ipswich</option>
           <option>Kontek</option>
           <option>Mt Cotton</option>
           <option>North Maclean</option>
@@ -2325,7 +2333,9 @@ function addLoad() {
           <option>Sunstate Asphalt</option>
           <option>Tarampa</option>
           <option>Wagners - Carrara</option>
+          <option>Wagners Carrara</option>
           <option>Wagners - Pinkenba</option>
+          <option>Wagners Pinkenba</option>
           <option value="Other">Other (type below)</option>
         </select>
         <div id="otherDeliverToWrap${idx}" style="display:none; margin-top:8px;">
