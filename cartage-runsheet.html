@@ -1573,12 +1573,14 @@ function splitQuarryMaterial(rVal) {
     [/^(DMC\s+TENTERFIELD)\s+(.+)$/i, 'DMC Tenterfield'],
     [/^(Mt Cotton)\s+(.+)$/i, 'Mt Cotton'],
     [/^(Fraser Coast)\s+(.+)$/i, 'Fraser Coast'],
-    [/^(Ipswich)\s+(.+)$/i, 'Ipswich'],
+    [/^(Fraser)\s+(.+)$/i, 'Fraser'],
     [/^(Holcim\s+\w+)$/i, null],
     // Coastal Sands with optional material e.g. "Coastal  Fine Sand" -> quarry: Coastal Sands, product: Fine Sand
     [/^(Coastal)\s+(.+)$/i, 'Coastal Sands'],
     [/^(Coastal Sands)$/i, null],
     [/^(Lantrak)$/i, null],
+    // Do NOT split "Ipswich Transfer" - it's a single concept, not pickup+product
+    [/^(Ipswich Transfer)$/i, null],
   ];
   for (const [pat, quarryOverride] of patterns) {
     const m = rVal.match(pat);
